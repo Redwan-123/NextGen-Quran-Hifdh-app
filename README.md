@@ -7,7 +7,6 @@ A premium, high-performance Quranic application designed for the modern user. Th
 
 ## 🔗 Live Application
 **Experience the live app here:** [https://next-gen-quran-hifdh-app.vercel.app/](https://next-gen-quran-hifdh-app.vercel.app/)
-![Uploading Screenshot 2026-01-23 at 16.41.38.png…]()
 
 ---
 
