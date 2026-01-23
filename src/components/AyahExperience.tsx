@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { Ayah, Tafsir } from '../types/quran';
 import { mockAyahs, tafsirData, qariOptions } from '../data/mockData';

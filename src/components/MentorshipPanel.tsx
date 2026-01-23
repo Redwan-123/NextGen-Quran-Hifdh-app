@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { mockMentors } from '../data/mockData';
 import { MessageCircle, Video, Star, Users, Send, Phone } from 'lucide-react';

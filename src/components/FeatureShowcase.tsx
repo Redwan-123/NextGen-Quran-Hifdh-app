@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Sparkles, Zap, Brain, Heart, Eye, Award } from 'lucide-react';
 
 export function FeatureShowcase() {
