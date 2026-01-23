@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { EmotionalEntry } from './components/EmotionalEntry';
 import { AyahExperience } from './components/AyahExperience';
-import { EnhancedHifdhDashboard } from './components/EnhancedHifdhDashboard';
+import { HifdhDashboard } from './components/HifdhDashboard';
 import { MentorshipPanel } from './components/MentorshipPanel';
 import { AnalyticsMode } from './components/AnalyticsMode';
 import { SurahBrowser } from './components/SurahBrowser';
@@ -24,12 +24,9 @@ export default function App() {
   };
 
   const handleSurahSelect = (surahNumber: number) => {
-    // In a real app, this would navigate to the surah reader
-    console.log('Selected Surah:', surahNumber);
-  };
-
-  const handleQuickAccess = (screen: string) => {
-    setCurrentScreen(screen as Screen);
+    // Navigates to Browse to read the Surah
+    console.log('Reading Surah:', surahNumber);
+    setCurrentScreen('surah-browser');
   };
 
   const navigationItems = [
@@ -42,7 +39,7 @@ export default function App() {
   ];
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-slate-50">
       {/* Floating Navigation */}
       <motion.div
         initial={{ y: -100 }}
@@ -96,7 +93,7 @@ export default function App() {
         {showMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </motion.button>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Content */}
       <AnimatePresence>
         {showMenu && (
           <motion.div
@@ -132,88 +129,43 @@ export default function App() {
       {/* Screen Transitions */}
       <AnimatePresence mode="wait">
         {currentScreen === 'home' && (
-          <motion.div
-            key="home"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+          <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
             <EmotionalEntry onEmotionSelect={handleEmotionSelect} />
           </motion.div>
         )}
 
         {currentScreen === 'ayah' && selectedEmotion && (
-          <motion.div
-            key="ayah"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <AyahExperience 
-              emotionId={selectedEmotion} 
-              onBack={() => setCurrentScreen('home')} 
-            />
+          <motion.div key="ayah" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
+            <AyahExperience emotionId={selectedEmotion} onBack={() => setCurrentScreen('home')} />
           </motion.div>
         )}
 
         {currentScreen === 'hifdh' && (
-          <motion.div
-            key="hifdh"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <EnhancedHifdhDashboard />
+          <motion.div key="hifdh" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}>
+            <HifdhDashboard />
           </motion.div>
         )}
 
         {currentScreen === 'mentorship' && (
-          <motion.div
-            key="mentorship"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-          >
+          <motion.div key="mentorship" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }}>
             <MentorshipPanel />
           </motion.div>
         )}
 
         {currentScreen === 'analytics' && (
-          <motion.div
-            key="analytics"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+          <motion.div key="analytics" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
             <AnalyticsMode />
           </motion.div>
         )}
 
         {currentScreen === 'surah-browser' && (
-          <motion.div
-            key="surah-browser"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+          <motion.div key="surah-browser" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
             <SurahBrowser onSurahSelect={handleSurahSelect} />
           </motion.div>
         )}
 
         {currentScreen === 'feature-showcase' && (
-          <motion.div
-            key="feature-showcase"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+          <motion.div key="feature-showcase" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
             <FeatureShowcase />
           </motion.div>
         )}
@@ -232,30 +184,16 @@ export default function App() {
       </AnimatePresence>
 
       {/* Decorative Elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <motion.div
           className="absolute top-20 right-20 w-96 h-96 bg-purple-300/10 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
           className="absolute bottom-20 left-20 w-96 h-96 bg-violet-300/10 rounded-full blur-3xl"
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.5, 0.3, 0.5],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
+          animate={{ scale: [1.2, 1, 1.2], opacity: [0.5, 0.3, 0.5] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
     </div>

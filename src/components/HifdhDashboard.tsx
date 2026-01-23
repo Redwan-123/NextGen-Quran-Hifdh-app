@@ -1,380 +1,239 @@
-import { motion } from 'motion/react';
-import { useState } from 'react';
-import { mockUserProgress, mockAyahs, similarAyahsData } from '../data/mockData';
-import { Brain, Target, Flame, TrendingUp, Zap, AlertCircle, ChevronDown, Mic } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Brain, Target, Flame, TrendingUp, Zap, Mic, BookOpen, Search, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Progress } from './ui/progress';
 import { Button } from './ui/button';
+import { mockUserProgress } from '../data/mockData';
+import { allSurahs, Surah } from '../data/surahData';
 
 export function HifdhDashboard() {
-  const [showSimilarityXRay, setShowSimilarityXRay] = useState(false);
-  const [selectedAyah, setSelectedAyah] = useState(mockAyahs[0]);
+  // --- State Configuration ---
+  const [selectedSurah, setSelectedSurah] = useState<Surah>(allSurahs[0]);
+  const [activeAyahs, setActiveAyahs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [currentAyahIndex, setCurrentAyahIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
   const [isRecording, setIsRecording] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
+  const [sessionMistakes, setSessionMistakes] = useState<{ ayah: number, error: string }[]>([]);
+  
   const [recitationFeedback, setRecitationFeedback] = useState({
     rhythm: 85,
     pitch: 78,
     confidence: 92,
-    mistakes: 2
   });
 
-  const similarAyahs = similarAyahsData[selectedAyah.id] || [];
+  // --- API Fetch Logic ---
+  useEffect(() => {
+    const fetchSurahContent = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number=${selectedSurah.number}`
+        );
+        const data = await response.json();
+        setActiveAyahs(data.verses);
+        setCurrentAyahIndex(0);
+        setSessionMistakes([]);
+        setIsFinished(false);
+      } catch (error) {
+        console.error("API Fetch Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSurahContent();
+  }, [selectedSurah]);
 
-  const startRecitation = () => {
-    setIsRecording(true);
-    // Simulate recording and feedback
-    setTimeout(() => {
-      setIsRecording(false);
-      // Update feedback with random values for demo
-      setRecitationFeedback({
-        rhythm: Math.floor(Math.random() * 20) + 80,
-        pitch: Math.floor(Math.random() * 20) + 75,
-        confidence: Math.floor(Math.random() * 15) + 85,
-        mistakes: Math.floor(Math.random() * 3)
-      });
-    }, 3000);
+  // --- Handlers ---
+  const handleNextAyah = (hasMistake: boolean, errorMsg?: string) => {
+    if (hasMistake && errorMsg) {
+      setSessionMistakes(prev => [...prev, { ayah: currentAyahIndex + 1, error: errorMsg }]);
+    }
+    
+    if (currentAyahIndex < activeAyahs.length - 1) {
+      setCurrentAyahIndex(prev => prev + 1);
+    } else {
+      setIsFinished(true);
+    }
   };
+
+  const filteredSurahs = allSurahs.filter(s => 
+    s.transliteration.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    s.number.toString() === searchQuery
+  );
+
+  // --- Completion View ---
+  if (isFinished) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center p-6">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 max-w-2xl w-full">
+          <h2 className="text-3xl font-bold text-slate-900 mb-2">Recitation Complete</h2>
+          <p className="text-slate-500 mb-8">Summary for Surah {selectedSurah.transliteration}</p>
+          <div className="space-y-4 mb-8">
+            {sessionMistakes.length === 0 ? (
+              <div className="p-6 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center gap-4">
+                <CheckCircle2 size={32} /> <span className="font-bold">Perfect recitation! Masha'Allah.</span>
+              </div>
+            ) : (
+              sessionMistakes.map((m, i) => (
+                <div key={i} className="p-4 bg-red-50 text-red-700 rounded-xl flex gap-3 border border-red-100">
+                  <AlertCircle size={20} className="mt-1 flex-shrink-0" />
+                  <p className="text-sm"><span className="font-bold">Ayah {m.ayah}:</span> {m.error}</p>
+                </div>
+              ))
+            )}
+          </div>
+          <Button onClick={() => { setIsFinished(false); setCurrentAyahIndex(0); setSessionMistakes([]); }} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-14 rounded-2xl">
+            <RefreshCw className="mr-2 w-5 h-5" /> Start New Session
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h1 className="text-4xl mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Hifdh Mastery
-          </h1>
-          <p className="text-slate-600">Track your memorization journey with intelligent feedback</p>
-        </motion.div>
-
-        {/* Stats Overview */}
+        
+        {/* Statistics Header (Your original stats) */}
         <div className="grid md:grid-cols-4 gap-4 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-lg"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <Flame className="w-8 h-8" />
-              <motion.span 
-                className="text-3xl"
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                {mockUserProgress.streakDays}
-              </motion.span>
-            </div>
-            <p className="text-sm opacity-90">Day Streak</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl p-6 text-white shadow-lg"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <Target className="w-8 h-8" />
-              <span className="text-3xl">{mockUserProgress.memorizedAyahs.length}</span>
-            </div>
-            <p className="text-sm opacity-90">Ayahs Memorized</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl p-6 text-white shadow-lg"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <TrendingUp className="w-8 h-8" />
-              <span className="text-3xl">{mockUserProgress.masteryPercentage}%</span>
-            </div>
-            <p className="text-sm opacity-90">Overall Mastery</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-6 text-white shadow-lg"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <Brain className="w-8 h-8" />
-              <span className="text-3xl">{mockUserProgress.weakLinks.length}</span>
-            </div>
-            <p className="text-sm opacity-90">Weak Links</p>
-          </motion.div>
+          <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-lg">
+            <Flame className="w-8 h-8 mb-2" />
+            <span className="text-3xl font-bold block">{mockUserProgress.streakDays}</span>
+            <p className="text-sm opacity-90 font-medium">Day Streak</p>
+          </div>
+          <div className="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl p-6 text-white shadow-lg">
+            <Target className="w-8 h-8 mb-2" />
+            <span className="text-3xl font-bold block">{mockUserProgress.memorizedAyahs.length}</span>
+            <p className="text-sm opacity-90 font-medium">Ayahs Memorized</p>
+          </div>
+          <div className="bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl p-6 text-white shadow-lg">
+            <TrendingUp className="w-8 h-8 mb-2" />
+            <span className="text-3xl font-bold block">{mockUserProgress.masteryPercentage}%</span>
+            <p className="text-sm opacity-90 font-medium">Overall Mastery</p>
+          </div>
+          <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-6 text-white shadow-lg">
+            <Brain className="w-8 h-8 mb-2" />
+            <span className="text-3xl font-bold block">{mockUserProgress.weakLinks.length}</span>
+            <p className="text-sm opacity-90 font-medium">Weak Links</p>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Practice Section */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Recitation Practice */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/50"
-            >
-              <div className="flex items-center justify-between mb-6">
+            
+            {/* Visual Recitation Practice Area (Your original Practice UI) */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/50">
+              <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h2 className="text-2xl text-slate-800 mb-1">Practice Recitation</h2>
-                  <p className="text-sm text-slate-500">Real-time feedback on your memorization</p>
+                  <h2 className="text-2xl font-bold text-slate-800">Practice Session</h2>
+                  <p className="text-slate-500">Currently Reading: {selectedSurah.transliteration} (Ayah {currentAyahIndex + 1})</p>
                 </div>
-                <Mic className={`w-8 h-8 ${isRecording ? 'text-red-500' : 'text-slate-400'}`} />
+                <div onClick={() => setIsRecording(!isRecording)} className="cursor-pointer">
+                   <Mic className={`${isRecording ? 'text-red-500 animate-pulse' : 'text-slate-300'} w-8 h-8`} />
+                </div>
               </div>
 
-              {/* Selected Ayah */}
-              <div className="mb-6 p-6 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100">
-                <p className="text-3xl text-center mb-4" dir="rtl" lang="ar">
-                  {selectedAyah.arabic}
-                </p>
-                <p className="text-center text-slate-600 text-sm italic">
-                  {selectedAyah.surahName} - Ayah {selectedAyah.ayahNumber}
-                </p>
-              </div>
-
-              {/* Recording Button */}
-              <div className="text-center mb-6">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={startRecitation}
-                  disabled={isRecording}
-                  className={`px-8 py-4 rounded-full font-medium shadow-lg transition-all ${
-                    isRecording
-                      ? 'bg-red-500 text-white'
-                      : 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:shadow-xl'
-                  }`}
-                >
-                  {isRecording ? (
-                    <span className="flex items-center gap-2">
-                      <motion.div
-                        className="w-3 h-3 bg-white rounded-full"
-                        animate={{ scale: [1, 1.3, 1] }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                      />
-                      Recording...
-                    </span>
-                  ) : (
-                    'Start Recitation'
-                  )}
-                </motion.button>
-              </div>
-
-              {/* Micro Feedback */}
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm text-slate-600">Rhythm & Timing</span>
-                    <span className="text-sm font-medium text-slate-800">{recitationFeedback.rhythm}%</span>
-                  </div>
-                  <Progress value={recitationFeedback.rhythm} className="h-2" />
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm text-slate-600">Pitch & Pronunciation</span>
-                    <span className="text-sm font-medium text-slate-800">{recitationFeedback.pitch}%</span>
-                  </div>
-                  <Progress value={recitationFeedback.pitch} className="h-2" />
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm text-slate-600">Confidence</span>
-                    <span className="text-sm font-medium text-slate-800">{recitationFeedback.confidence}%</span>
-                  </div>
-                  <Progress value={recitationFeedback.confidence} className="h-2" />
-                </div>
-
-                {recitationFeedback.mistakes > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl"
-                  >
-                    <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-amber-800 font-medium">
-                        {recitationFeedback.mistakes} pause(s) detected
-                      </p>
-                      <p className="text-xs text-amber-600 mt-1">
-                        Practice the highlighted sections to improve fluency
-                      </p>
-                    </div>
-                  </motion.div>
+              <div className="mb-8 p-10 bg-slate-900 rounded-3xl min-h-[300px] flex flex-col items-center justify-center shadow-inner relative overflow-hidden">
+                {loading ? (
+                  <div className="text-indigo-400 font-bold animate-pulse text-xl font-arabic">Loading...</div>
+                ) : (
+                  <AnimatePresence mode="wait">
+                    <motion.p key={currentAyahIndex} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="text-4xl text-white text-center leading-[2.2] font-arabic" dir="rtl">
+                      {activeAyahs[currentAyahIndex]?.text_uthmani}
+                    </motion.p>
+                  </AnimatePresence>
                 )}
               </div>
+
+              {/* Feedback Section */}
+              <div className="grid grid-cols-3 gap-6 mb-8">
+                {Object.entries(recitationFeedback).map(([label, value]) => (
+                    <div key={label}>
+                      <div className="flex justify-between text-[10px] uppercase font-bold text-slate-400 mb-2">
+                        <span>{label}</span>
+                        <span>{value}%</span>
+                      </div>
+                      <Progress value={value} className="h-2" />
+                    </div>
+                ))}
+              </div>
+
+              {/* Control Buttons (Backend logic integrated here) */}
+              <div className="flex gap-4">
+                <Button onClick={() => handleNextAyah(false)} className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white h-12 rounded-xl font-bold">
+                  Correct
+                </Button>
+                <Button onClick={() => handleNextAyah(true, "Pronunciation error detected")} className="flex-1 bg-red-500 hover:bg-red-600 text-white h-12 rounded-xl font-bold">
+                  Mistake
+                </Button>
+              </div>
             </motion.div>
 
-            {/* Similarity X-Ray */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/50"
-            >
-              <button
-                onClick={() => setShowSimilarityXRay(!showSimilarityXRay)}
-                className="w-full flex items-center justify-between mb-4"
-              >
-                <div className="flex items-center gap-3">
-                  <Zap className="w-6 h-6 text-purple-600" />
-                  <div className="text-left">
-                    <h3 className="text-xl text-slate-800">Ayah Similarity X-Ray</h3>
-                    <p className="text-sm text-slate-500">Identify confusing similar verses</p>
-                  </div>
+            {/* Surah Selection Grid (Your original Card UI) */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-indigo-600" /> Select Surah
+                </h3>
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input 
+                    type="text" 
+                    placeholder="Search surahs..." 
+                    className="pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none bg-white/50"
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
-                <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${showSimilarityXRay ? 'rotate-180' : ''}`} />
-              </button>
+              </div>
 
-              {showSimilarityXRay && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="space-y-4 pt-4 border-t border-slate-200"
-                >
-                  {similarAyahs.map((similar, index) => (
-                    <motion.div
-                      key={similar.ayah.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl border border-purple-100"
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-medium text-purple-700">
-                          {similar.ayah.surahName} {similar.ayah.ayahNumber}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <div className="h-2 w-24 bg-white rounded-full overflow-hidden">
-                            <motion.div
-                              className="h-full bg-gradient-to-r from-purple-500 to-indigo-500"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${similar.similarity}%` }}
-                              transition={{ duration: 1, delay: index * 0.1 }}
-                            />
-                          </div>
-                          <span className="text-sm font-medium text-slate-700">
-                            {similar.similarity}%
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <p className="text-2xl mb-2" dir="rtl" lang="ar">
-                        {similar.ayah.arabic}
-                      </p>
-                      
-                      <div className="flex items-start gap-2 p-3 bg-white/70 rounded-lg">
-                        <AlertCircle className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
-                        <p className="text-xs text-slate-600">
-                          <strong>Divergence:</strong> {similar.divergencePoint}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))}
-
-                  {similarAyahs.length === 0 && (
-                    <p className="text-center text-slate-500 py-8">
-                      No similar ayahs found for this verse
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                {filteredSurahs.map((surah: Surah) => (
+                  <motion.div
+                    key={surah.number}
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => setSelectedSurah(surah)}
+                    className={`cursor-pointer p-5 rounded-2xl border-2 transition-all ${
+                      selectedSurah.number === surah.number 
+                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-indigo-200 shadow-xl' 
+                        : 'bg-white border-slate-100 hover:border-indigo-300'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <span className={`text-xs font-bold px-2 py-1 rounded-md ${selectedSurah.number === surah.number ? 'bg-white/20' : 'bg-slate-50 text-slate-500'}`}>
+                        {surah.number}
+                      </span>
+                      <span className="font-arabic text-lg">{surah.name}</span>
+                    </div>
+                    <h4 className="font-bold truncate text-sm">{surah.transliteration}</h4>
+                    <p className={`text-[10px] mt-1 ${selectedSurah.number === surah.number ? 'text-indigo-100' : 'text-slate-400'}`}>
+                      {surah.totalVerses} Ayahs • {surah.type}
                     </p>
-                  )}
-                </motion.div>
-              )}
-            </motion.div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Sidebar - Spaced Repetition */}
+          {/* Practice Queue Sidebar (Your original Sidebar) */}
           <div className="space-y-6">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-              className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/50 sticky top-8"
-            >
-              <h3 className="text-lg text-slate-800 mb-4 flex items-center gap-2">
-                <Brain className="w-5 h-5 text-indigo-600" />
-                Today's Practice
+            <div className="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-lg border border-slate-100">
+              <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <Zap className="text-amber-500 w-5 h-5" /> Quick Review
               </h3>
-
-              <div className="space-y-3 mb-6">
-                {mockUserProgress.weakLinks.slice(0, 3).map((ayahId, index) => {
-                  const ayah = mockAyahs.find(a => a.id === ayahId);
-                  return (
-                    <motion.button
-                      key={ayahId}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 + index * 0.1 }}
-                      onClick={() => setSelectedAyah(ayah!)}
-                      className={`w-full p-4 text-left rounded-xl border-2 transition-all ${
-                        selectedAyah?.id === ayahId
-                          ? 'bg-indigo-50 border-indigo-300'
-                          : 'bg-slate-50 border-slate-200 hover:border-indigo-200'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-slate-700">
-                          {ayah?.surahName} {ayah?.ayahNumber}
-                        </span>
-                        <span className="text-xs text-red-500">Weak Link</span>
-                      </div>
-                      <p className="text-xs text-slate-500 line-clamp-2">
-                        {ayah?.translation}
-                      </p>
-                    </motion.button>
-                  );
-                })}
-              </div>
-
-              <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600">
-                Generate Practice Schedule
-              </Button>
-
-              <div className="mt-6 pt-6 border-t border-slate-200">
-                <p className="text-xs text-slate-500 text-center mb-2">
-                  Next review recommended in
-                </p>
-                <p className="text-2xl text-center text-indigo-600 font-medium">
-                  2h 30m
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Motivational Progress */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 }}
-              className="bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg"
-            >
-              <h4 className="text-lg mb-4">Weekly Progress</h4>
-              <div className="space-y-3">
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
-                  <div key={day} className="flex items-center justify-between">
-                    <span className="text-sm opacity-90">{day}</span>
-                    <div className="flex gap-1">
-                      {[...Array(5)].map((_, j) => (
-                        <motion.div
-                          key={j}
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ delay: 0.6 + (i * 0.05) + (j * 0.02) }}
-                          className={`w-3 h-3 rounded-sm ${
-                            j < (i <= new Date().getDay() ? Math.floor(Math.random() * 5) + 1 : 0)
-                              ? 'bg-white'
-                              : 'bg-white/20'
-                          }`}
-                        />
-                      ))}
-                    </div>
+              <div className="space-y-4">
+                {mockUserProgress.weakLinks.slice(0, 3).map((id, i) => (
+                  <div key={i} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 group cursor-pointer hover:border-indigo-200">
+                    <p className="text-xs font-bold text-slate-700 mb-1 group-hover:text-indigo-600">Review Item {id}</p>
+                    <p className="text-[10px] text-slate-400 italic leading-tight">Focus on precision and rhythm.</p>
                   </div>
                 ))}
               </div>
-            </motion.div>
+              <Button className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-6 rounded-2xl shadow-lg shadow-indigo-100">
+                Start AI Drill
+              </Button>
+            </div>
           </div>
         </div>
       </div>
