@@ -13,7 +13,13 @@ export function Settings({ darkMode, onDarkModeToggle }: SettingsProps) {
 
   useEffect(() => {
     const saved = localStorage.getItem('quran_bookmarks');
-    if (saved) setBookmarks(JSON.parse(saved));
+    if (saved) {
+      try {
+        setBookmarks(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse bookmarks", e);
+      }
+    }
   }, []);
 
   const deleteBookmark = (id: string) => {
@@ -50,7 +56,9 @@ export function Settings({ darkMode, onDarkModeToggle }: SettingsProps) {
                       </div>
                       <p className={`text-sm font-arabic line-clamp-1 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`} dir="rtl">{b.text}</p>
                     </div>
-                    <button onClick={() => deleteBookmark(b.id)} className="p-2 text-slate-400 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
+                    <button onClick={() => deleteBookmark(b.id)} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
+                      <Trash2 size={18} />
+                    </button>
                   </div>
                 ))}
               </div>

@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { mockUserProgress, mockAyahs, similarAyahsData } from '../data/mockData';
 import { Brain, Target, Flame, TrendingUp, Zap, AlertCircle, ChevronDown, Mic, Volume2, CheckCircle, XCircle, Pause, Award, Clock } from 'lucide-react';

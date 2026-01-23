@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { emotions } from '../data/mockData';
 import { Emotion } from '../types/quran';
 import { useState } from 'react';
