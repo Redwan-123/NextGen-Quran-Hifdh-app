@@ -7,14 +7,16 @@ import { MentorshipPanel } from './components/MentorshipPanel';
 import { AnalyticsMode } from './components/AnalyticsMode';
 import { SurahBrowser } from './components/SurahBrowser';
 import { FeatureShowcase } from './components/FeatureShowcase';
-import { Home, BookOpen, Brain, Users, BarChart3, Menu, X, Book } from 'lucide-react';
+import { Settings } from './components/Settings';
+import { Home, BookOpen, Brain, Users, BarChart3, Menu, X, Book, Settings as SettingsIcon } from 'lucide-react';
 
-type Screen = 'home' | 'ayah' | 'hifdh' | 'mentorship' | 'analytics' | 'surah-browser' | 'feature-showcase';
+type Screen = 'home' | 'ayah' | 'hifdh' | 'mentorship' | 'analytics' | 'surah-browser' | 'feature-showcase' | 'settings';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
   const handleEmotionSelect = (emotionId: string) => {
     setSelectedEmotion(emotionId);
@@ -36,6 +38,7 @@ export default function App() {
     { id: 'hifdh' as Screen, label: 'Hifdh', icon: Brain },
     { id: 'mentorship' as Screen, label: 'Mentors', icon: Users },
     { id: 'analytics' as Screen, label: 'Insights', icon: BarChart3 },
+    { id: 'settings' as Screen, label: 'Settings', icon: SettingsIcon },
   ];
 
   return (
@@ -212,6 +215,18 @@ export default function App() {
             transition={{ duration: 0.3 }}
           >
             <FeatureShowcase />
+          </motion.div>
+        )}
+
+        {currentScreen === 'settings' && (
+          <motion.div
+            key="settings"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Settings darkMode={darkMode} onDarkModeToggle={() => setDarkMode(!darkMode)} />
           </motion.div>
         )}
       </AnimatePresence>
