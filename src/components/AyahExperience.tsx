@@ -2,7 +2,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useState } from 'react';
 import { Ayah, Tafsir } from '../types/quran';
 import { mockAyahs, tafsirData, qariOptions } from '../data/mockData';
-import { BookOpen, Play, Pause, Volume2, ChevronRight, Info, Sparkles, ArrowLeft } from 'lucide-react';
+import { emotionActionSteps, hadithRecommendations } from '../data/actionSteps';
+import { BookOpen, Play, Pause, Volume2, ChevronRight, Info, Sparkles, ArrowLeft, CheckCircle2, Footprints } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface AyahExperienceProps {
@@ -13,12 +14,23 @@ interface AyahExperienceProps {
 export function AyahExperience({ emotionId, onBack }: AyahExperienceProps) {
   const ayah = mockAyahs.find(a => a.emotions.includes(emotionId)) || mockAyahs[0];
   const tafsirs = tafsirData[ayah.id] || [];
+  const actionSteps = emotionActionSteps[emotionId] || [];
+  const hadith = hadithRecommendations[emotionId];
+  const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   
   const [showTafsir, setShowTafsir] = useState(false);
   const [selectedTafsir, setSelectedTafsir] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedQari, setSelectedQari] = useState(qariOptions[0]);
   const [showQariMenu, setShowQariMenu] = useState(false);
+
+  const toggleStepComplete = (stepId: string) => {
+    setCompletedSteps(prev => 
+      prev.includes(stepId) 
+        ? prev.filter(id => id !== stepId)
+        : [...prev, stepId]
+    );
+  };
 
   const getToneColor = (tone: string) => {
     switch (tone) {
@@ -347,6 +359,88 @@ export function AyahExperience({ emotionId, onBack }: AyahExperienceProps) {
             </motion.div>
           </div>
         </div>
+
+        {/* Action Steps - Full Width */}
+        {actionSteps.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="mt-8"
+          >
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-8 shadow-2xl text-white">
+              <div className="flex items-center gap-3 mb-6">
+                <Footprints className="w-6 h-6" />
+                <h2 className="text-2xl">What To Do Now</h2>
+              </div>
+              <p className="text-white/90 mb-6">
+                Don't just read - take action. Here are practical steps to help you feel better:
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                {actionSteps.map((step, index) => (
+                  <motion.button
+                    key={step.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.7 + (index * 0.1) }}
+                    onClick={() => toggleStepComplete(step.id)}
+                    className={`p-4 rounded-2xl text-left transition-all ${
+                      completedSteps.includes(step.id)
+                        ? 'bg-white/30 border-2 border-white/50'
+                        : 'bg-white/10 border-2 border-white/20 hover:bg-white/20'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0">
+                        {completedSteps.includes(step.id) ? (
+                          <CheckCircle2 className="w-6 h-6 text-white fill-white/30" />
+                        ) : (
+                          <div className="w-6 h-6 rounded-full border-2 border-white/50" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">{step.icon}</span>
+                          <span className="text-xs px-2 py-0.5 bg-white/20 rounded-full">
+                            {step.duration}
+                          </span>
+                        </div>
+                        <h3 className={`font-medium mb-1 ${completedSteps.includes(step.id) ? 'line-through opacity-70' : ''}`}>
+                          {step.title}
+                        </h3>
+                      </div>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+
+              {/* Hadith Recommendation */}
+              {hadith && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1 }}
+                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20"
+                >
+                  <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+                    <span>📖</span> A Hadith for Reflection
+                  </h3>
+                  <p className="text-white/90 italic mb-2 leading-relaxed">
+                    "{hadith.text}"
+                  </p>
+                  <p className="text-sm text-white/70">
+                    — {hadith.reference}
+                  </p>
+                </motion.div>
+              )}
+
+              <div className="mt-6 text-center text-white/70 text-sm">
+                <p>Check off each action as you complete it. Small steps lead to big changes.</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );
