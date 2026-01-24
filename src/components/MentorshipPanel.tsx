@@ -1,47 +1,66 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { mockMentors } from '../data/mockData';
-import { MessageCircle, Video, Star, Users, Send, Phone } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { mentorsData, getOrCreateChatHistory, saveChatMessage } from '../data/mentorsData';
+import { MessageCircle, Video, Star, Users, Send, Phone, Clock, DollarSign } from 'lucide-react';
 import { Button } from './ui/button';
 
-export function MentorshipPanel() {
-  const [selectedMentor, setSelectedMentor] = useState(mockMentors[0]);
+interface MentorshipPanelProps {
+  darkMode?: boolean;
+}
+
+export function MentorshipPanel({ darkMode = false }: MentorshipPanelProps) {
+  const [selectedMentor, setSelectedMentor] = useState(mentorsData[0]);
+  const [chatHistory, setChatHistory] = useState<any[]>([]);
   const [message, setMessage] = useState('');
-  const [chatMessages, setChatMessages] = useState([
-    {
-      id: '1',
-      sender: 'mentor',
-      text: "As-salamu alaykum! I've reviewed your recent practice sessions. MashAllah, great progress on Surah Al-Mulk!",
-      time: '10:30 AM'
-    },
-    {
-      id: '2',
-      sender: 'user',
-      text: "Wa alaykumu as-salam! JazakAllah khair. I'm struggling with the similar ayahs in Surah Al-Baqarah.",
-      time: '10:32 AM'
-    },
-    {
-      id: '3',
-      sender: 'mentor',
-      text: "I understand. Let's focus on the distinct endings of those verses. I'll send you a custom practice schedule.",
-      time: '10:35 AM'
+  const userId = 'default_user'; // In a real app, this would come from auth context
+
+  useEffect(() => {
+    // Load chat history for this mentor
+    const history = getOrCreateChatHistory(userId, selectedMentor.id);
+    if (history.length === 0) {
+      // Initialize with default message if no history
+      setChatHistory([
+        {
+          id: '1',
+          sender: 'mentor',
+          text: `As-salamu alaykum! I'm ${selectedMentor.name}. I'm here to help you with ${selectedMentor.specialty}. How can I assist you today?`,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
+    } else {
+      setChatHistory(history);
     }
-  ]);
+  }, [selectedMentor]);
 
   const handleSendMessage = () => {
     if (message.trim()) {
-      setChatMessages([...chatMessages, {
+      const userMessage = {
         id: Date.now().toString(),
         sender: 'user',
         text: message,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      }]);
+      };
+
+      setChatHistory([...chatHistory, userMessage]);
+      saveChatMessage(userId, selectedMentor.id, userMessage);
       setMessage('');
+
+      // Simulate mentor response after a delay
+      setTimeout(() => {
+        const mentorResponse = {
+          id: (Date.now() + 1).toString(),
+          sender: 'mentor',
+          text: `Thank you for that question! That's a great area to focus on. Let me share some insights about ${userMessage.text.toLowerCase().substring(0, 30)}...`,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setChatHistory(prev => [...prev, mentorResponse]);
+        saveChatMessage(userId, selectedMentor.id, mentorResponse);
+      }, 1000);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50">
+    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0f1117]' : 'bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50'}`}>
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <motion.div
@@ -66,7 +85,7 @@ export function MentorshipPanel() {
               <h2 className="text-lg text-slate-800 mb-4">Available Mentors</h2>
               
               <div className="space-y-3">
-                {mockMentors.map((mentor, index) => (
+                {mentorsData.map((mentor, index) => (
                   <motion.button
                     key={mentor.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -142,6 +161,7 @@ export function MentorshipPanel() {
                       size="sm"
                       variant="ghost"
                       className="text-white hover:bg-white/20"
+                      disabled={!selectedMentor.available}
                     >
                       <Phone className="w-4 h-4" />
                     </Button>
@@ -149,16 +169,33 @@ export function MentorshipPanel() {
                       size="sm"
                       variant="ghost"
                       className="text-white hover:bg-white/20"
+                      disabled={!selectedMentor.available}
                     >
                       <Video className="w-4 h-4" />
                     </Button>
+                  </div>
+                </div>
+
+                {/* Mentor Info */}
+                <div className="mt-4 pt-4 border-t border-white/20 grid grid-cols-3 gap-4 text-white text-sm">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4" />
+                    <span>{selectedMentor.rating} ({selectedMentor.students} students)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    <span>{selectedMentor.responseTime}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4" />
+                    <span>${selectedMentor.sessionPrice}/session</span>
                   </div>
                 </div>
               </div>
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                {chatMessages.map((msg, index) => (
+                {chatHistory.map((msg, index) => (
                   <motion.div
                     key={msg.id}
                     initial={{ opacity: 0, y: 10 }}

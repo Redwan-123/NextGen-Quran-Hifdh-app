@@ -3599,3 +3599,57 @@ html {
     opacity: .5;
   }
 }
+
+/* Custom overrides for Surah reading and responsive typography */
+
+.app-bg {
+  background: linear-gradient(180deg, rgba(99,102,241,0.06) 0%, rgba(123,97,255,0.06) 50%, rgba(99,102,241,0.04) 100%);
+}
+
+.font-arabic, .surah-name {
+  font-family: 'Scheherazade New', 'Amiri', serif;
+}
+
+.ayah-text {
+  font-family: 'Scheherazade New', 'Amiri', serif;
+  font-size: clamp(1.2rem, 5.5vw, 2.2rem);
+  line-height: 1.9;
+  color: #f8fafc; /* light on purple */
+  text-shadow: 0 1px 0 rgba(0,0,0,0.15);
+}
+
+.translation {
+  font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif);
+  font-style: normal;
+  color: rgba(248,250,252,0.9);
+  margin-top: 0.4rem;
+  font-size: clamp(.78rem, 3.2vw, 1rem);
+}
+
+.reading-panel {
+  background: linear-gradient(180deg, #6d28d9 0%, #5b21b6 60%);
+  color: #f8fafc;
+}
+
+.ayah-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.ayah-actions button {
+  background: transparent;
+  border: none;
+  color: rgba(248,250,252,0.9);
+  padding: 6px;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .reading-panel .p-8 { padding: 1rem; }
+  .ayah-card { padding: 0.8rem; }
+  .ayah-text { font-size: clamp(1rem, 6vw, 1.8rem); }
+  .surah-name { font-size: clamp(1rem, 5.5vw, 1.6rem); }
+  .text-4xl { font-size: 1.25rem; }
+}
+

@@ -195,9 +195,14 @@ export const tafsirData: Record<string, Tafsir[]> = {
 
 export const qariOptions = [
   { id: 'husary', name: 'Sheikh Mahmoud Khalil Al-Husary', style: 'Murattal' },
-  { id: 'minshawi', name: 'Sheikh Mohamed Siddiq Al-Minshawi', style: 'Mujawwad' },
+  { id: 'minshawi', name: 'Sheikh Mohamed Siddiq Al-Minshawi', style: 'Murattal' },
   { id: 'sudais', name: 'Sheikh Abdul Rahman Al-Sudais', style: 'Murattal' },
   { id: 'shuraim', name: 'Sheikh Saud Al-Shuraim', style: 'Murattal' },
+  { id: 'ajmi', name: 'Sheikh Ahmad Al-Ajmi', style: 'Murattal' },
+  { id: 'abdulbasit', name: 'Sheikh Abdul Basit Abdul Samad', style: 'Murattal' },
+  { id: 'maher', name: 'Sheikh Maher Al-Mueaqly', style: 'Murattal' },
+  { id: 'yasser', name: 'Sheikh Yaser Al-Dosari', style: 'Murattal' },
+  { id: 'afasy', name: 'Sheikh Mishary Rashid Al-Afasy', style: 'Murattal' },
   { id: 'ajmi', name: 'Sheikh Ahmad Al-Ajmi', style: 'Murattal' }
 ];
 

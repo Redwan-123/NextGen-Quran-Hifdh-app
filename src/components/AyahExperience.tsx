@@ -1,5 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { ErrorBoundary } from './ErrorBoundary';
+import { API_BASE } from '../lib/api';
 import { Ayah, Tafsir } from '../types/quran';
 import { mockAyahs, tafsirData, qariOptions } from '../data/mockData';
 import { emotionActionSteps, hadithRecommendations } from '../data/actionSteps';
@@ -9,9 +12,10 @@ import { Button } from './ui/button';
 interface AyahExperienceProps {
   emotionId: string;
   onBack: () => void;
+  darkMode?: boolean;
 }
 
-export function AyahExperience({ emotionId, onBack }: AyahExperienceProps) {
+export function AyahExperience({ emotionId, onBack, darkMode = false }: AyahExperienceProps) {
   const ayah = mockAyahs.find(a => a.emotions.includes(emotionId)) || mockAyahs[0];
   const tafsirs = tafsirData[ayah.id] || [];
   const actionSteps = emotionActionSteps[emotionId] || [];
@@ -21,8 +25,11 @@ export function AyahExperience({ emotionId, onBack }: AyahExperienceProps) {
   const [showTafsir, setShowTafsir] = useState(false);
   const [selectedTafsir, setSelectedTafsir] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedQari, setSelectedQari] = useState(qariOptions[0]);
+  const [reciters, setReciters] = useState<any[]>([]);
+  const [selectedReciterId, setSelectedReciterId] = useState<number | string | null>(null);
   const [showQariMenu, setShowQariMenu] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
 
   const toggleStepComplete = (stepId: string) => {
     setCompletedSteps(prev => 
@@ -34,24 +41,136 @@ export function AyahExperience({ emotionId, onBack }: AyahExperienceProps) {
 
   const getToneColor = (tone: string) => {
     switch (tone) {
-      case 'mercy': return { bg: 'from-emerald-400/20 to-teal-400/20', glow: 'bg-emerald-400', text: 'text-emerald-600' };
-      case 'warning': return { bg: 'from-orange-400/20 to-red-400/20', glow: 'bg-orange-400', text: 'text-orange-600' };
-      case 'reflection': return { bg: 'from-blue-400/20 to-cyan-400/20', glow: 'bg-blue-400', text: 'text-blue-600' };
-      case 'hope': return { bg: 'from-violet-400/20 to-purple-400/20', glow: 'bg-violet-400', text: 'text-violet-600' };
-      case 'guidance': return { bg: 'from-amber-400/20 to-yellow-400/20', glow: 'bg-amber-400', text: 'text-amber-600' };
-      default: return { bg: 'from-slate-400/20 to-gray-400/20', glow: 'bg-slate-400', text: 'text-slate-600' };
+      case 'mercy': return { bg: 'from-emerald-200/8 to-teal-200/6', glow: 'bg-emerald-300/60', text: 'text-emerald-700' };
+      case 'warning': return { bg: 'from-orange-200/6 to-orange-300/6', glow: 'bg-orange-300/50', text: 'text-orange-700' };
+      case 'reflection': return { bg: 'from-blue-200/6 to-cyan-200/6', glow: 'bg-blue-300/50', text: 'text-blue-700' };
+      case 'hope': return { bg: 'from-violet-200/6 to-purple-200/6', glow: 'bg-violet-300/50', text: 'text-violet-700' };
+      case 'guidance': return { bg: 'from-amber-200/6 to-yellow-200/6', glow: 'bg-amber-300/50', text: 'text-amber-700' };
+      default: return { bg: 'from-slate-50/4 to-slate-100/4', glow: 'bg-slate-300/30', text: 'text-slate-800' };
     }
   };
 
   const toneColors = getToneColor(ayah.tone);
 
   const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-    // In a real app, this would control actual audio playback
+    if (!isPlaying) {
+      playRecitation();
+    } else {
+      setIsPlaying(false);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    }
   };
 
+  useEffect(() => {
+    // fetch reciters from Quran.com API
+    const fetchReciters = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/reciters`);
+        const json = await res.json();
+        const list = json?.reciters || [];
+        setReciters(list);
+        // prefer user's saved reciter if available
+        const pref = typeof window !== 'undefined' ? localStorage.getItem('preferredReciter') : null;
+        if (pref) {
+          setSelectedReciterId(pref);
+        } else if (list.length > 0 && !selectedReciterId) {
+          setSelectedReciterId(list[0].id || list[0].server || list[0].identifier);
+        }
+      } catch (err) {
+        console.warn('Could not load reciters', err);
+      }
+    };
+    fetchReciters();
+  }, []);
+
+  // Direct everyayah.com CDN - most reliable source
+  function getEveryAyahUrl(reciterFolder: string, surah: number, ayah: number) {
+    const surahPadded = String(surah).padStart(3, '0');
+    const ayahPadded = String(ayah).padStart(3, '0');
+    return `https://everyayah.com/data/${reciterFolder}/${surahPadded}${ayahPadded}.mp3`;
+  }
+
+  // Map reciter IDs to everyayah.com folder names
+  function getReciterFolder(reciterId: any) {
+    const id = String(reciterId).toLowerCase();
+    const mapping: Record<string, string> = {
+      '7': 'Husary_128kbps',
+      'husary': 'Husary_128kbps',
+      '5': 'Minshawy_Murattal_128kbps',
+      'minshawi': 'Minshawy_Murattal_128kbps',
+      '11': 'Abdurrahmaan_As-Sudais_192kbps',
+      'sudais': 'Abdurrahmaan_As-Sudais_192kbps',
+      '3': 'Ahmed_ibn_Ali_al-Ajamy_128kbps',
+      'ajmi': 'Ahmed_ibn_Ali_al-Ajamy_128kbps',
+      '1': 'Abdul_Basit_Murattal_192kbps',
+      'abdulbasit': 'Abdul_Basit_Murattal_192kbps',
+      'maher': 'Maher_AlMuaiqly_128kbps',
+      'maher_almuaiqly': 'Maher_AlMuaiqly_128kbps',
+      'yasser': 'Yasser_Ad-Dussary_128kbps',
+      'yaser': 'Yasser_Ad-Dussary_128kbps',
+      'dussary': 'Yasser_Ad-Dussary_128kbps',
+      'afasy': 'Alafasy_128kbps',
+      'mishary': 'Alafasy_128kbps',
+      'alafasy': 'Alafasy_128kbps',
+      'shuraim': 'Saood_ash-Shuraym_128kbps'
+    };
+    return mapping[id] || 'Husary_128kbps'; // Default to Husary
+  }
+
+  async function playRecitation() {
+    const reciterId = selectedReciterId;
+    if (!reciterId) {
+      console.warn('No reciter selected');
+      return;
+    }
+    const surah = ayah.surahNumber;
+    const verse = ayah.ayahNumber;
+    
+    try {
+      setIsAudioLoading(true);
+      
+      // Get direct CDN URL
+      const reciterFolder = getReciterFolder(reciterId);
+      const audioUrl = getEveryAyahUrl(reciterFolder, surah, verse);
+      
+      console.log('Playing audio from:', audioUrl);
+      
+      if (!audioRef.current) audioRef.current = new Audio();
+      audioRef.current.src = audioUrl;
+      
+      await audioRef.current.play();
+      setIsPlaying(true);
+      
+      console.log('Audio playing successfully');
+    } catch (err) {
+      console.error('Error playing audio:', err);
+      // Try fallback to Quran.com API
+      try {
+        const quranUrl = `https://api.quran.com/api/v4/recitations/7/by_ayah/${surah}:${verse}`;
+        const resp = await fetch(quranUrl);
+        const data = await resp.json();
+        const fallbackUrl = data.audio_files?.[0]?.url;
+        if (fallbackUrl) {
+          const fullUrl = fallbackUrl.startsWith('http') ? fallbackUrl : `https://audio.quran.com${fallbackUrl}`;
+          if (!audioRef.current) audioRef.current = new Audio();
+          audioRef.current.src = fullUrl;
+          await audioRef.current.play();
+          setIsPlaying(true);
+        }
+      } catch (fallbackErr) {
+        console.error('Fallback audio also failed:', fallbackErr);
+      }
+    } finally {
+      setIsAudioLoading(false);
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50/30">
+    <ErrorBoundary>
+      <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0f1117]' : 'bg-gradient-to-br from-slate-50 via-white to-purple-50/30'}`}>
       {/* Ambient background glow */}
       <motion.div 
         className={`fixed inset-0 bg-gradient-to-br ${toneColors.bg} pointer-events-none`}
@@ -203,7 +322,10 @@ export function AyahExperience({ emotionId, onBack }: AyahExperienceProps) {
                       onClick={() => setShowQariMenu(!showQariMenu)}
                       className="text-slate-800 hover:text-purple-600 transition-colors flex items-center gap-1"
                     >
-                      {selectedQari.name}
+                      {(() => {
+                        const sel = reciters.find(r => String(r.id) === String(selectedReciterId) || String(r.server) === String(selectedReciterId) || String(r.identifier) === String(selectedReciterId));
+                        return sel ? sel.name : 'Select reciter';
+                      })()}
                       <ChevronRight className={`w-4 h-4 transition-transform ${showQariMenu ? 'rotate-90' : ''}`} />
                     </button>
                   </div>
@@ -233,22 +355,22 @@ export function AyahExperience({ emotionId, onBack }: AyahExperienceProps) {
                     className="overflow-hidden"
                   >
                     <div className="space-y-2 pt-4 border-t border-slate-200">
-                      {qariOptions.map((qari) => (
+                      {(reciters && reciters.length ? reciters : qariOptions.map(q => ({ id: q.id, name: q.name, server: q.id }))).map((r) => (
                         <button
-                          key={qari.id}
+                          key={r.id || r.server || r.identifier}
                           onClick={() => {
-                            setSelectedQari(qari);
+                            setSelectedReciterId(r.id || r.server || r.identifier);
                             setShowQariMenu(false);
                           }}
                           className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
-                            selectedQari.id === qari.id 
-                              ? 'bg-purple-100 text-purple-700' 
+                            String(selectedReciterId) === String(r.id || r.server || r.identifier)
+                              ? 'bg-purple-100 text-purple-700'
                               : 'hover:bg-slate-100 text-slate-700'
                           }`}
                         >
                           <div className="flex justify-between items-center">
-                            <span className="text-sm">{qari.name}</span>
-                            <span className="text-xs text-slate-500">{qari.style}</span>
+                            <span className="text-sm">{r.name}</span>
+                            <span className="text-xs text-slate-500">{r.style || r.server || ''}</span>
                           </div>
                         </button>
                       ))}
@@ -377,6 +499,30 @@ export function AyahExperience({ emotionId, onBack }: AyahExperienceProps) {
                 Don't just read - take action. Here are practical steps to help you feel better:
               </p>
 
+              {/* AI Recommendation (if any) */}
+              {typeof window !== 'undefined' && (() => {
+                try {
+                  const raw = localStorage.getItem('lastAIRecommendation');
+                  if (raw) {
+                    const ai = JSON.parse(raw);
+                    return (
+                      <div className="mb-6 p-4 bg-white/10 rounded-xl border border-white/20">
+                        <h3 className="font-semibold">AI Recommendation</h3>
+                        <p className="mt-2 text-sm text-white/90">{ai.summary}</p>
+                        <ul className="mt-3 space-y-2">
+                          {ai.prioritized && ai.prioritized.map((p: any, i: number) => (
+                            <li key={i} className="text-sm text-white/90">• {p.step} <span className="opacity-80">— {p.why}</span></li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  }
+                } catch (err) {
+                  return null;
+                }
+                return null;
+              })()}
+
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 {actionSteps.map((step, index) => (
                   <motion.button
@@ -443,5 +589,6 @@ export function AyahExperience({ emotionId, onBack }: AyahExperienceProps) {
         )}
       </div>
     </div>
+    </ErrorBoundary>
   );
 }
