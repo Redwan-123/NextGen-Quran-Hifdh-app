@@ -38,8 +38,8 @@ export function AnalyticsMode({ darkMode = false }: AnalyticsModeProps) {
   }));
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-slate-900' : 'bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50'}`}>
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50'}`}>
+      <div className="max-w-7xl mx-auto px-6 pb-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

@@ -65,7 +65,7 @@ export default function App() {
         animate={{ y: 0 }}
         className="fixed top-6 left-1/2 -translate-x-1/2 z-50"
       >
-        <div className="bg-white/80 backdrop-blur-2xl rounded-full shadow-2xl border border-white/50 px-2 py-2 flex items-center gap-1">
+        <div className={`rounded-full shadow-2xl border px-2 py-2 flex items-center gap-1 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentScreen === item.id;
@@ -103,12 +103,15 @@ export default function App() {
       </motion.div>
       )}
 
+      {/* Spacer to push content below fixed nav */}
+      {currentScreen !== 'landing' && <div className="h-32 md:h-36 lg:h-40"></div>}
+
       {/* Mobile Menu Toggle */}
       <motion.button
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         onClick={() => setShowMenu(!showMenu)}
-        className="md:hidden fixed top-6 right-6 z-50 w-12 h-12 bg-white/80 backdrop-blur-xl rounded-full shadow-lg flex items-center justify-center border border-white/50"
+        className={`md:hidden fixed top-6 right-6 z-50 w-12 h-12 rounded-full shadow-lg flex items-center justify-center border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}
       >
         {showMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </motion.button>
@@ -120,7 +123,7 @@ export default function App() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden fixed top-20 right-6 z-40 bg-white/90 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/50 p-4 min-w-[200px]"
+            className={`md:hidden fixed top-20 right-6 z-40 rounded-2xl shadow-2xl border p-4 min-w-[200px] ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}
           >
             {navigationItems.map((item) => {
               const Icon = item.icon;

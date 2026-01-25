@@ -86,7 +86,7 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
   };
 
   return (
-    <div className={`min-h-screen relative overflow-hidden transition-colors duration-500 ${darkMode ? 'bg-[#0f1117]' : 'bg-gradient-to-br from-slate-50 via-violet-50 to-purple-50'} pt-28`}>
+    <div className={`min-h-screen relative overflow-hidden transition-colors duration-500 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-gradient-to-br from-slate-50 via-violet-50 to-purple-50'}`}>
       {/* Animated background particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
@@ -135,10 +135,10 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
             <Heart className="w-16 h-16 text-purple-400 fill-purple-200" />
           </motion.div>
           
-          <h1 className="text-4xl mb-3 bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">
+          <h1 className={`text-4xl mb-3 bg-gradient-to-r ${darkMode ? 'from-purple-300 to-violet-300' : 'from-purple-600 to-violet-600'} bg-clip-text text-transparent`}>
             How are you feeling?
           </h1>
-          <p className="text-slate-500 text-lg max-w-md mx-auto">
+          <p className={`text-lg max-w-md mx-auto ${darkMode ? 'text-purple-200' : 'text-slate-500'}`}>
             Let the Qur'an speak to your heart. Select an emotion or describe how you feel.
           </p>
         </motion.div>
@@ -174,10 +174,18 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
               )}
 
               {/* Card */}
-              <div className={`relative bg-white/70 backdrop-blur-xl rounded-3xl p-6 border-2 transition-all duration-300 ${
-                selectedEmotion === emotion.id 
-                  ? 'border-purple-400 shadow-2xl' 
-                  : 'border-white/50 shadow-lg hover:border-purple-200'
+              <div className={`relative rounded-3xl p-6 border-2 transition-all duration-300 ${
+                darkMode
+                  ? `bg-purple-900/20 backdrop-blur-xl border-purple-500/40 ${
+                      selectedEmotion === emotion.id 
+                        ? 'border-purple-400 shadow-2xl shadow-purple-500/20' 
+                        : 'shadow-lg hover:border-purple-400'
+                    }`
+                  : `bg-white/70 backdrop-blur-xl border-white/50 ${
+                      selectedEmotion === emotion.id 
+                        ? 'border-purple-400 shadow-2xl' 
+                        : 'shadow-lg hover:border-purple-200'
+                    }`
               }`}>
                 {selectedEmotion === emotion.id && (
                   <motion.div

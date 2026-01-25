@@ -170,7 +170,7 @@ export function AyahExperience({ emotionId, onBack, darkMode = false }: AyahExpe
 
   return (
     <ErrorBoundary>
-      <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0f1117]' : 'bg-gradient-to-br from-slate-50 via-white to-purple-50/30'}`}>
+      <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-gradient-to-br from-slate-50 via-white to-purple-50/30'}`}>
       {/* Ambient background glow */}
       <motion.div 
         className={`fixed inset-0 bg-gradient-to-br ${toneColors.bg} pointer-events-none`}

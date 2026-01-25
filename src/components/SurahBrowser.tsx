@@ -286,8 +286,8 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
   });
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0f1117]' : 'bg-gradient-to-br from-slate-50 via-amber-50/30 to-orange-50'}`}>
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-gradient-to-br from-slate-50 via-amber-50/30 to-yellow-50'}`}>
+      <div className="max-w-7xl mx-auto px-6 pb-8">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="text-4xl mb-2 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-bold">

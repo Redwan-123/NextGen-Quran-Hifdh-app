@@ -29,8 +29,8 @@ export function Settings({ darkMode, onDarkModeToggle }: SettingsProps) {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0f1117]' : 'bg-slate-50'}`}>
-      <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-slate-50'}`}>
+      <div className="max-w-4xl mx-auto px-6 pb-12">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
           <h1 className={`text-4xl font-bold mb-2 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Settings</h1>
           <p className={`transition-colors duration-300 ${darkMode ? 'text-slate-300' : 'text-slate-500'}`}>Manage your preferences and bookmarks</p>
@@ -38,7 +38,7 @@ export function Settings({ darkMode, onDarkModeToggle }: SettingsProps) {
 
         <div className="space-y-6">
           {/* Saved Bookmarks Section */}
-          <motion.div className={`rounded-[2rem] p-8 shadow-xl border transition-colors duration-300 ${darkMode ? 'bg-slate-800/40 border-white/5' : 'bg-white border-slate-100'}`}>
+          <motion.div className={`rounded-[2rem] p-8 shadow-xl border transition-colors duration-300 ${darkMode ? 'bg-purple-900/20 border-purple-500/20 backdrop-blur-xl' : 'bg-white border-slate-100'}`}>
             <h2 className={`text-xl font-bold mb-6 flex items-center gap-3 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
               <BookmarkIcon className="text-amber-500" /> Saved Ayahs
             </h2>
@@ -66,7 +66,7 @@ export function Settings({ darkMode, onDarkModeToggle }: SettingsProps) {
           </motion.div>
 
           {/* Appearance Section */}
-          <div className={`rounded-[2rem] p-8 shadow-xl border transition-colors duration-300 ${darkMode ? 'bg-slate-800/40 border-white/5' : 'bg-white border-slate-100'}`}>
+          <div className={`rounded-[2rem] p-8 shadow-xl border transition-colors duration-300 ${darkMode ? 'bg-purple-900/20 border-purple-500/20 backdrop-blur-xl' : 'bg-white border-slate-100'}`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className={`p-3 rounded-2xl transition-colors duration-300 ${darkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-500/10 text-indigo-500'}`}>{darkMode ? <Moon /> : <Sun />}</div>

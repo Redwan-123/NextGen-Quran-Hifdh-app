@@ -60,8 +60,8 @@ export function MentorshipPanel({ darkMode = false }: MentorshipPanelProps) {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0f1117]' : 'bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50'}`}>
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50'}`}>
+      <div className="max-w-7xl mx-auto px-6 pb-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

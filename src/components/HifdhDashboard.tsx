@@ -97,8 +97,8 @@ export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0f1117]' : 'bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50'}`}>
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50'}`}>
+      <div className="max-w-7xl mx-auto px-6 pb-8">
         
         {/* Statistics Header (Your original stats) */}
         <div className="grid md:grid-cols-4 gap-4 mb-8">
