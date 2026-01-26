@@ -11,12 +11,17 @@ import {
   X,
   ChevronRight,
   Share2,
+  Home,
+  BookOpen,
+  Users,
+  BarChart3,
 } from 'lucide-react';
 
 import { Button } from './ui/button';
 import { API_BASE } from '../lib/api';
 import { qariOptions } from '../data/mockData';
 import { allSurahs, juzData, Surah } from '../data/surahData';
+import { SurahReader } from './SurahReader';
 
 interface SurahBrowserProps {
   onSurahSelect: (surahNumber: number) => void;
@@ -150,7 +155,16 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
     setIsAudioLoading(true);
     try {
       const url = `${API_BASE}/api/audio?reciter=${preferredReciter}&surah=${readingSurah.number}&ayah=${ayahIndex + 1}`;
-      if (!audioRef.current) audioRef.current = new Audio();
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+        audioRef.current.addEventListener('ended', () => {
+          setIsPlaying(false);
+          // Auto-play next ayah
+          if (ayahIndex < verses.length - 1) {
+            playAyahAudio(ayahIndex + 1);
+          }
+        });
+      }
       audioRef.current.src = url;
       await audioRef.current.play();
       setIsPlaying(true);
@@ -164,13 +178,12 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
   };
 
   const togglePlayPause = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
+    if (isPlaying && audioRef.current) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play();
-      setIsPlaying(true);
+      const idx = currentAyahIndex !== null ? currentAyahIndex : 0;
+      playAyahAudio(idx);
     }
   };
 
@@ -271,16 +284,10 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
     };
 
     const fetchReciters = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/api/reciters`);
-        const json = await res.json();
-        const list = json?.reciters || [];
-        setReciters(list);
-        if (!selectedReciterId && list.length) {
-          setSelectedReciterId(list[0].id || list[0].server || list[0].identifier);
-        }
-      } catch (err) {
-        console.warn('Could not load reciters', err);
+      // Use local mock data directly
+      setReciters(qariOptions);
+      if (!selectedReciterId && qariOptions.length) {
+        setSelectedReciterId(qariOptions[0].id);
       }
     };
 
@@ -298,11 +305,11 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
   });
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className={`min-h-screen ${darkMode ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}`}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 pb-16">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-semibold text-slate-900">Browse the Qur'an</h1>
-          <p className="text-slate-600 text-sm md:text-base">Teleport into any Surah instantly with immersive reading tools.</p>
+          <h1 className="text-3xl md:text-4xl font-semibold text-orange-500">Browse the Qur'an</h1>
+          <p className={`text-sm md:text-base ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Teleport into any Surah instantly with immersive reading tools.</p>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="space-y-4 mb-8">
@@ -357,7 +364,7 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="relative mb-10 rounded-[32px] p-6 md:p-8 bg-gradient-to-br from-purple-50 to-purple-100 text-slate-900 shadow-lg overflow-hidden border border-purple-200"
+            className={`relative mb-10 rounded-[32px] p-6 md:p-8 shadow-lg overflow-hidden border ${darkMode ? 'bg-gradient-to-br from-slate-800 to-slate-700 text-white border-slate-600' : 'bg-gradient-to-br from-purple-50 to-purple-100 text-slate-900 border-purple-200'}`}
           >
             <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(168,85,247,0.2), transparent 60%)' }} />
             <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -412,7 +419,7 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
                   transition={{ delay: 0.2 + index * 0.02 }}
                   whileHover={{ y: -4, scale: 1.01 }}
                   onClick={() => handleOpenSurah(surah)}
-                  className="relative bg-white rounded-2xl p-6 border border-slate-200 shadow-md hover:shadow-lg text-left text-slate-900"
+                  className={`relative rounded-2xl p-6 border shadow-md hover:shadow-lg text-left ${darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
                 >
                   {isLastRead && (
                     <span className="absolute top-4 left-4 px-2 py-1 text-[10px] font-semibold rounded-full bg-amber-100 text-amber-700">
@@ -486,182 +493,25 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
 
       <AnimatePresence>
         {readingSurah && (
-          <motion.div
-            className="fixed inset-0 z-50 bg-gradient-to-b from-[#7c3aed] via-[#6d28d9] to-[#5b21b6]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 40 }}
-              transition={{ duration: 0.2 }}
-              className="relative z-10 w-full h-full flex flex-col text-white overflow-hidden"
-            >
-              {/* Header */}
-              <div className="px-6 md:px-10 py-6 border-b border-white/20">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="text-2xl md:text-3xl font-semibold text-white">{readingSurah.transliteration}</h2>
-                    <p className="text-white/70 text-sm">{readingSurah.name} • Medinan</p>
-                  </div>
-                  <button
-                    onClick={handleCloseReading}
-                    className="p-2 hover:bg-white/10 rounded-full transition"
-                  >
-                    <X className="w-6 h-6 text-white" />
-                  </button>
-                </div>
-                <nav className="flex items-center gap-3 text-xs uppercase tracking-[0.3em]">
-                  {heroTabs.map((tab) => (
-                    <span
-                      key={tab}
-                      className={`px-3 py-1.5 rounded-full border transition-all ${
-                        tab === 'Browse'
-                          ? 'bg-[#a78bfa] border-[#e879f9] text-white/95 shadow-lg'
-                          : 'border-white/20 text-white/60 hover:text-white/80'
-                      }`}
-                    >
-                      {tab}
-                    </span>
-                  ))}
-                </nav>
-              </div>
-
-              {/* Main Content */}
-              <div className="flex-1 overflow-y-auto px-6 md:px-10 py-8">
-                <div className="max-w-3xl mx-auto space-y-8">
-                  {/* Preview Section */}
-                  {currentAyahIndex !== null && verses[currentAyahIndex] && (
-                    <motion.div
-                      key={`preview-${currentAyahIndex}`}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="bg-white/10 backdrop-blur rounded-3xl p-8 border border-white/20"
-                    >
-                      <div className="text-center mb-6">
-                        <span className="inline-block px-4 py-2 bg-[#a78bfa] text-white text-xs font-bold rounded-full tracking-wider">
-                          Preview
-                        </span>
-                      </div>
-                      <div className="text-5xl md:text-6xl font-arabic leading-relaxed text-white text-center mb-6" dir="rtl">
-                        {verses[currentAyahIndex].text_uthmani || verses[currentAyahIndex].text}
-                      </div>
-                      <div className="flex items-center justify-center gap-3 mb-6">
-                        <div className="w-12 h-12 rounded-full bg-amber-400 flex items-center justify-center text-white font-bold text-lg">
-                          {currentAyahIndex + 1}
-                        </div>
-                      </div>
-                      <p className="text-lg text-white/90 leading-relaxed text-center">
-                        {getAyahTranslation(verses[currentAyahIndex])}
-                      </p>
-                    </motion.div>
-                  )}
-
-                  {/* All Ayahs */}
-                  <div className="space-y-4">
-                    {loading && <p className="text-white/60 text-center">Loading verses...</p>}
-                    {!loading &&
-                      verses.map((ayah, index) => (
-                        <motion.button
-                          key={ayah.id || index}
-                          ref={(el) => (ayahRefs.current[index] = el)}
-                          onClick={() => handleAyahToggleSelect(index)}
-                          variants={{
-                            idle: { opacity: 0.5 },
-                            active: { opacity: 1 },
-                          }}
-                          animate={index === currentAyahIndex ? 'active' : 'idle'}
-                          transition={{ duration: 0.2 }}
-                          className={`w-full text-left p-6 rounded-2xl border-2 transition-all ${
-                            index === currentAyahIndex
-                              ? 'bg-white/15 border-white/60 shadow-xl scale-100'
-                              : 'bg-white/5 border-white/10 hover:bg-white/10'
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-4 mb-3">
-                            <span className="inline-block px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full">
-                              Ayah {index + 1}
-                            </span>
-                            <div className="flex items-center gap-2 text-white/70">
-                              <button onClick={(e) => {e.stopPropagation(); toggleBookmark(index);}} className="hover:text-white">
-                                <Bookmark className={`w-5 h-5 ${isAyahBookmarked(index) ? 'fill-amber-400 text-amber-400' : ''}`} />
-                              </button>
-                              <button className="hover:text-white">
-                                <Share2 className="w-5 h-5" />
-                              </button>
-                            </div>
-                          </div>
-                          <div className="text-3xl md:text-4xl font-arabic leading-relaxed text-white mb-3" dir="rtl">
-                            {ayah.text_uthmani || ayah.text}
-                          </div>
-                          <p className="text-sm md:text-base text-white/80 leading-relaxed">
-                            {getAyahTranslation(ayah)}
-                          </p>
-                        </motion.button>
-                      ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Controls */}
-              <div className="border-t border-white/20 bg-gradient-to-t from-[#5b21b6] to-transparent">
-                <div className="px-6 md:px-10 py-6">
-                  {/* Ayah Toggle Pill Bar */}
-                  <div className="mb-6 pb-6 border-b border-white/20">
-                    <p className="text-xs uppercase tracking-[0.3em] text-white/60 mb-3">Navigate Ayahs</p>
-                    <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                      {verses.map((_, index) => (
-                        <button
-                          key={`pill-${index}`}
-                          onClick={() => handleAyahToggleSelect(index)}
-                          className={`px-4 py-2 rounded-full font-bold text-sm transition-all whitespace-nowrap ${
-                            index === currentAyahIndex
-                              ? 'bg-[#a78bfa] text-white shadow-lg scale-110'
-                              : 'bg-white/10 border border-white/20 text-white/70 hover:bg-white/15'
-                          }`}
-                        >
-                          {index + 1}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Player Controls */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <p className="text-xs uppercase tracking-[0.3em] text-white/60 mb-2">Now Playing</p>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center text-white font-bold">
-                          {currentAyahIndex !== null ? currentAyahIndex + 1 : '—'}
-                        </div>
-                        <div>
-                          <p className="text-white font-semibold">{readingSurah.transliteration} - Ayah {currentAyahIndex !== null ? currentAyahIndex + 1 : 1}</p>
-                          <p className="text-sm text-white/70">{reciterDisplayName}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <button onClick={playPrevious} className="p-2 hover:bg-white/10 rounded-full transition text-white/80 hover:text-white">
-                        <SkipBack className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={togglePlayPause}
-                        className="w-14 h-14 rounded-full bg-[#a78bfa] text-white flex items-center justify-center shadow-lg hover:bg-[#c084fc] transition disabled:opacity-60"
-                        disabled={isAudioLoading}
-                      >
-                        {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}
-                      </button>
-                      <button onClick={playNext} className="p-2 hover:bg-white/10 rounded-full transition text-white/80 hover:text-white">
-                        <SkipForward className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+          <SurahReader
+            surahName={readingSurah.transliteration}
+            surahNameArabic={readingSurah.name}
+            surahType={readingSurah.type}
+            surahNumber={readingSurah.number}
+            verses={verses}
+            onClose={handleCloseReading}
+            reciterDisplayName={reciterDisplayName}
+            isPlaying={isPlaying}
+            currentAyahIndex={currentAyahIndex}
+            onTogglePlayPause={togglePlayPause}
+            onPlayNext={playNext}
+            onPlayPrevious={playPrevious}
+            isAudioLoading={isAudioLoading}
+            onAyahSelect={handleAyahToggleSelect}
+            bookmarkedAyahs={bookmarkedAyahs}
+            onToggleBookmark={toggleBookmark}
+            onAudioPlay={playAyahAudio}
+          />
         )}
       </AnimatePresence>
     </div>

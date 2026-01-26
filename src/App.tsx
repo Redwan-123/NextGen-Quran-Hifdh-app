@@ -47,7 +47,8 @@ export default function App() {
   };
 
   const navigationItems = [
-    { id: 'home' as Screen, label: 'Home', icon: Home },
+    { id: 'landing' as Screen, label: 'Start', icon: Home },
+    { id: 'home' as Screen, label: 'Emotions', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>🤲</span> },
     { id: 'surah-browser' as Screen, label: 'Browse', icon: Book },
     { id: 'hifdh' as Screen, label: 'Hifdh', icon: Brain },
     { id: 'mentorship' as Screen, label: 'Mentors', icon: Users },
