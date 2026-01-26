@@ -12,20 +12,41 @@ export function Settings({ darkMode, onDarkModeToggle }: SettingsProps) {
   const [bookmarks, setBookmarks] = useState<any[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('quran_bookmarks');
-    if (saved) {
-      try {
-        setBookmarks(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to parse bookmarks", e);
+    const load = () => {
+      const detailed = localStorage.getItem('quran_bookmarks_detail');
+      if (detailed) {
+        try {
+          setBookmarks(JSON.parse(detailed));
+          return;
+        } catch (e) {
+          console.error('Failed to parse detailed bookmarks', e);
+        }
       }
-    }
+
+      const legacy = localStorage.getItem('quran_bookmarks');
+      if (legacy) {
+        try {
+          const arr = JSON.parse(legacy);
+          const normalized = arr.map((b: any, idx: number) => ({
+            id: b.id || `${b.surah}-${b.ayah || b.verseNumber || idx + 1}`,
+            surahNumber: b.surah || b.surahNumber,
+            surahName: b.surahName || 'Surah',
+            verseNumber: b.ayah || b.verseNumber,
+            text: b.text || b.ayahText || '',
+          }));
+          setBookmarks(normalized);
+        } catch (e) {
+          console.error('Failed to parse legacy bookmarks', e);
+        }
+      }
+    };
+    load();
   }, []);
 
   const deleteBookmark = (id: string) => {
     const updated = bookmarks.filter(b => b.id !== id);
     setBookmarks(updated);
-    localStorage.setItem('quran_bookmarks', JSON.stringify(updated));
+    localStorage.setItem('quran_bookmarks_detail', JSON.stringify(updated));
   };
 
   return (
@@ -51,7 +72,7 @@ export function Settings({ darkMode, onDarkModeToggle }: SettingsProps) {
                   <div key={b.id} className={`p-4 rounded-2xl flex justify-between items-center ${darkMode ? 'bg-white/5' : 'bg-slate-50'}`}>
                     <div>
                       <div className="flex gap-2 items-center mb-1">
-                        <span className="text-[10px] font-bold bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded">{b.surahName}</span>
+                        <span className="text-[10px] font-bold bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded">{b.surahName || `Surah ${b.surahNumber}`}</span>
                         <span className="text-xs text-slate-400">Verse {b.verseNumber}</span>
                       </div>
                       <p className={`text-sm font-arabic line-clamp-1 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`} dir="rtl">{b.text}</p>

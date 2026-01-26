@@ -47,7 +47,6 @@ export default function App() {
   };
 
   const navigationItems = [
-    { id: 'landing' as Screen, label: 'Landing', icon: Home },
     { id: 'home' as Screen, label: 'Home', icon: Home },
     { id: 'surah-browser' as Screen, label: 'Browse', icon: Book },
     { id: 'hifdh' as Screen, label: 'Hifdh', icon: Brain },

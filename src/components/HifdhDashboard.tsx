@@ -20,6 +20,9 @@ export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [sessionMistakes, setSessionMistakes] = useState<{ ayah: number, error: string }[]>([]);
+  const [practicePlan, setPracticePlan] = useState<string[]>([]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('Focus on tajweed for today, tighten rhythm, then test with random ayahs.');
   
   const [recitationFeedback, setRecitationFeedback] = useState({
     rhythm: 85,
@@ -66,6 +69,23 @@ export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
     s.transliteration.toLowerCase().includes(searchQuery.toLowerCase()) || 
     s.number.toString() === searchQuery
   );
+
+  const generatePlan = () => {
+    setAiLoading(true);
+    setTimeout(() => {
+      const mistakesSummary = sessionMistakes.length > 0
+        ? `Review ayahs ${sessionMistakes.map(m => m.ayah).join(', ')}`
+        : 'Start with a warm-up recitation';
+      const plan = [
+        `${mistakesSummary} in ${selectedSurah.transliteration} using slow tempo.`,
+        `Shadow recite Ayah ${currentAyahIndex + 1} with a trusted qari, then record yourself.`,
+        'Drill one maqam for 5 minutes, then switch to natural voice to check clarity.',
+        'Finish with a closed-book recall of 3 ayahs and mark any hesitations.',
+      ];
+      setPracticePlan(plan);
+      setAiLoading(false);
+    }, 600);
+  };
 
   // --- Completion View ---
   if (isFinished) {
@@ -218,6 +238,32 @@ export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
                 ))}
               </div>
             </div>
+
+            {/* AI Practice Helper */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white/85 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-800">AI Practice Prompt</h3>
+                  <p className="text-sm text-slate-500">Auto-generate a focused drill for this session.</p>
+                </div>
+                <Button onClick={generatePlan} disabled={aiLoading} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 h-11 rounded-xl">
+                  {aiLoading ? 'Thinking…' : 'Generate Plan'}
+                </Button>
+              </div>
+              <textarea
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                className="w-full rounded-2xl border border-slate-200 p-4 text-sm text-slate-700 bg-white/80 focus:ring-2 focus:ring-indigo-200 outline-none mb-4"
+                rows={3}
+              />
+              <div className="space-y-3">
+                {(practicePlan.length ? practicePlan : [aiPrompt]).map((line, idx) => (
+                  <div key={idx} className="p-3 rounded-2xl bg-indigo-50 text-indigo-800 text-sm border border-indigo-100">
+                    {line}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </div>
 
           {/* Practice Queue Sidebar (Your original Sidebar) */}

@@ -1,10 +1,8 @@
 import { motion } from 'framer-motion';
 import { emotions } from '../data/mockData';
 import { Emotion } from '../types/quran';
-import { useState, useEffect } from 'react';
-import { Sparkles, Heart } from 'lucide-react';
-import { API_BASE } from '../lib/api';
-import { qariOptions } from '../data/mockData';
+import { useState } from 'react';
+import { Sparkles, Heart, Zap, Brain, Users, BookOpen } from 'lucide-react';
 
 interface EmotionalEntryProps {
   onEmotionSelect: (emotionId: string) => void;
@@ -12,73 +10,12 @@ interface EmotionalEntryProps {
   darkMode?: boolean;
 }
 
-// Helper to fetch audio from Quran.com
-const getAudioUrl = async (ayahKey: string, reciterId: string | number | null) => {
-  try {
-    const id = reciterId || '7';
-    const response = await fetch(`https://api.quran.com/api/v4/recitations/${id}/by_ayah/${ayahKey}`);
-    const data = await response.json();
-    const audioPath = data.audio_files?.[0]?.url;
-    if (!audioPath) return null;
-    return audioPath.startsWith('http') ? audioPath : `https://audio.quran.com${audioPath}`;
-  } catch (err) {
-    console.error("Audio fetch failed", err);
-    return null;
-  }
-};
-
 export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = false }: EmotionalEntryProps) {
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
   const [customEmotion, setCustomEmotion] = useState('');
   const [hoveredEmotion, setHoveredEmotion] = useState<string | null>(null);
-  const [reciters, setReciters] = useState<any[]>([]);
-  const [preferredReciter, setPreferredReciter] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Set default reciter immediately from localStorage or mock data
-    const pref = localStorage.getItem('preferredReciter');
-    if (pref) {
-      setPreferredReciter(pref);
-    } else {
-      setPreferredReciter(qariOptions[0].id);
-    }
-
-    // Load reciters in background (non-blocking)
-    const load = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/api/reciters`, { signal: AbortSignal.timeout(3000) });
-        const json = await res.json();
-        const list = json?.reciters || [];
-        
-        if (list.length > 0) {
-          setReciters(list);
-          return;
-        }
-      } catch (err) {
-        console.warn('API reciters fetch failed', err);
-      }
-
-      // Fallback: Try Quran.com directly
-      try {
-        const quranRes = await fetch('https://api.quran.com/api/v4/recitations', { signal: AbortSignal.timeout(3000) });
-        const quranData = await quranRes.json();
-        const allReciters = quranData.recitations || [];
-        if (allReciters.length > 0) {
-          setReciters(allReciters);
-          return;
-        }
-      } catch (err) {
-        console.warn('Quran.com reciters fetch failed', err);
-      }
-
-      // Final fallback to mock data
-      setReciters(qariOptions);
-    };
-
-    load();
-  }, []);
-
-  const handleEmotionClick = async (emotion: Emotion) => {
+  const handleEmotionClick = (emotion: Emotion) => {
     setSelectedEmotion(emotion.id);
     setTimeout(() => {
       onEmotionSelect(emotion.id);
@@ -243,28 +180,12 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
               className="w-full px-6 py-4 bg-white/70 backdrop-blur-xl rounded-2xl border-2 border-white/50 
                 focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-200/50 
                 text-slate-700 placeholder:text-slate-400 shadow-lg transition-all"
-              onKeyPress={async (e) => {
+              onKeyPress={(e) => {
                 if (e.key === 'Enter' && customEmotion.trim()) {
                   setSelectedEmotion('custom');
-                  try {
-                    const res = await fetch(`${API_BASE}/api/emotion`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ text: customEmotion })
-                    });
-                    const data = await res.json();
-                    if (data.aiRecommendation) {
-                      localStorage.setItem('lastAIRecommendation', JSON.stringify(data.aiRecommendation));
-                      // Prefetch audio for AI Recommendation
-                      const url = await getAudioUrl(`${data.aiRecommendation.surah}:${data.aiRecommendation.ayah}`, preferredReciter || '7');
-                      if (url) localStorage.setItem('autoPlayNext', url);
-                    }
-                    const map: Record<string, string> = { happy: 'grateful', sad: 'lost', anxious: 'anxious', angry: 'confused', neutral: 'peaceful' };
-                    setTimeout(() => onEmotionSelect(map[data.emotion] || 'peaceful'), 400);
-                  } catch (err) {
-                    console.error('Emotion API failed', err);
-                    setTimeout(() => onEmotionSelect('anxious'), 400);
-                  }
+                  setTimeout(() => {
+                    onEmotionSelect('anxious'); // Default to anxious for custom
+                  }, 800);
                 }
               }}
             />
@@ -272,15 +193,15 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
           </div>
         </motion.div>
 
-        {/* Preferred reciter selector */}
-        <div className="mt-8 w-full max-w-md text-center">
-          <label className="text-sm text-slate-500 mb-2 block font-medium">Preferred reciter</label>
-          <select value={preferredReciter || ''} onChange={(e) => { setPreferredReciter(e.target.value); localStorage.setItem('preferredReciter', e.target.value); }} className="w-full p-3 rounded-xl bg-white/70 border-2 border-white shadow-md outline-none text-slate-700">
-            {reciters.map(r => (
-              <option key={r.id} value={r.id}>{r.name}</option>
-            ))}
-          </select>
-        </div>
+        {/* Subtle bottom decoration */}
+        <motion.div
+          className="mt-16 text-center text-slate-400 text-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+        >
+          <p>Your journey of reflection begins here</p>
+        </motion.div>
       </div>
     </div>
   );
