@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Analytics } from '@vercel/analytics/react';
 import { LandingPage } from './components/LandingPage';
 import { EmotionalEntry } from './components/EmotionalEntry';
 import { AyahExperience } from './components/AyahExperience';
@@ -225,6 +226,7 @@ export default function App() {
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
+      <Analytics />
     </div>
   );
 }
