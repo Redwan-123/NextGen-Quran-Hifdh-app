@@ -65,7 +65,7 @@ export default function App() {
         animate={{ y: 0 }}
         className="fixed top-6 left-1/2 -translate-x-1/2 z-50"
       >
-        <div className={`rounded-full shadow-2xl border px-2 py-2 flex items-center gap-1 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
+        <div className="rounded-full border border-white/10 px-2 py-2 flex items-center gap-1 bg-[#4a167a]/90 shadow-[0_25px_70px_rgba(37,3,68,0.55)] backdrop-blur-2xl">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentScreen === item.id;
@@ -79,22 +79,22 @@ export default function App() {
                 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`relative px-4 py-2.5 rounded-full transition-all ${
+                className={`relative px-4 py-2.5 rounded-full transition-all reader-sans text-[0.7rem] font-semibold uppercase tracking-[0.35em] ${
                   isActive 
-                    ? 'text-white' 
-                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100/50'
+                    ? 'text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.35)]' 
+                    : 'text-purple-100/70 hover:text-white'
                 }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 bg-gradient-to-r from-purple-500 to-violet-500 rounded-full"
+                    className="absolute inset-0 rounded-full bg-[#2d0745]"
                     transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                   />
                 )}
-                <div className="relative flex items-center gap-2">
+                <div className="relative z-10 flex items-center gap-2">
                   <Icon className="w-4 h-4" />
-                  <span className="text-sm font-medium hidden md:inline">{item.label}</span>
+                  <span className="hidden md:inline">{item.label}</span>
                 </div>
               </motion.button>
             );

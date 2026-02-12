@@ -1,6 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600&family=Playfair+Display:wght@500&family=Scheherazade+New:wght@400;700&display=swap');
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --reader-sans: 'Space Grotesk', 'Plus Jakarta Sans', var(--font-sans);
+  --reader-display: 'Playfair Display', 'Space Grotesk', serif;
   --font-size: 16px;
   --background: #ffffff;
   --foreground: oklch(0.145 0 0);
@@ -120,12 +124,23 @@
 }
 
 @layer base {
+  .reader-sans {
+    font-family: var(--reader-sans);
+    letter-spacing: -0.01em;
+  }
+
+  .reader-display {
+    font-family: var(--reader-display);
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--reader-sans);
+    letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

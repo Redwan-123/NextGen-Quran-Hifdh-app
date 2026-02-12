@@ -58,7 +58,7 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
   const [verses, setVerses] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [translationsList, setTranslationsList] = useState<any[]>([]);
-  const [selectedTranslation, setSelectedTranslation] = useState<number | null>(21);
+  const [selectedTranslation, setSelectedTranslation] = useState<number | null>(20);
   const [reciters, setReciters] = useState<any[]>([]);
   const [selectedReciterId, setSelectedReciterId] = useState<string | number | null>(() => {
     const saved = typeof window !== 'undefined' ? localStorage.getItem('preferredReciter') : null;
@@ -205,26 +205,22 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
     const fetchVerses = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number=${readingSurah.number}`);
-        const data = await res.json();
-        let base = data?.verses || [];
-
+        const params = new URLSearchParams({
+          language: 'en',
+          per_page: '300',
+          fields: 'text_uthmani',
+        });
         if (selectedTranslation) {
-          try {
-            const tRes = await fetch(`https://api.quran.com/api/v4/quran/translations/${selectedTranslation}?chapter_number=${readingSurah.number}`);
-            const tJson = await tRes.json();
-            const translations = tJson?.translations || [];
-            const map = translations.reduce((acc: Record<string, any>, item: any) => {
-              if (item.verse_key && item.text) {
-                acc[item.verse_key] = item.text;
-              }
-              return acc;
-            }, {});
-            base = base.map((v: any) => ({ ...v, translation: { text: map[v.verse_key] } }));
-          } catch (err) {
-            console.warn('Translation fetch failed', err);
-          }
+          params.append('translations', String(selectedTranslation));
         }
+        const res = await fetch(
+          `https://api.quran.com/api/v4/verses/by_chapter/${readingSurah.number}?${params.toString()}`
+        );
+        const data = await res.json();
+        const base = (data?.verses || []).map((verse: any) => ({
+          ...verse,
+          translation: verse?.translations?.[0]?.text ? { text: verse.translations[0].text } : undefined,
+        }));
 
         ayahRefs.current = [];
         setVerses(base);
@@ -305,31 +301,32 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
   });
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}`}>
-      <div className="max-w-7xl mx-auto px-4 md:px-6 pb-16">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-semibold text-orange-500">Browse the Qur'an</h1>
-          <p className={`text-sm md:text-base ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Teleport into any Surah instantly with immersive reading tools.</p>
+    <div className="min-h-screen bg-gradient-to-br from-[#5a1a8c] via-[#7d2ba3] to-[#3a0d5c] !text-white">
+      {!readingSurah && (
+        <div className="max-w-7xl mx-auto px-4 md:px-6 pb-16">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 pt-8">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold !text-white mb-2">Browse the Qur'an</h1>
+          <p className="!text-base md:text-lg !text-purple-200">Explore and read the Holy Quran</p>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="space-y-4 mb-8">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 !text-purple-300" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name, transliteration, or meaning..."
-              className="w-full pl-12 pr-4 py-3 md:py-4 bg-white text-slate-900 placeholder-slate-400 rounded-2xl border border-slate-200 shadow-sm focus:ring-2 focus:ring-purple-500"
+              placeholder="Search surahs by name..."
+              className="w-full pl-12 pr-4 py-3 md:py-4 bg-white/10 backdrop-blur-md !text-white !placeholder-purple-200 rounded-2xl border border-purple-400/30 focus:border-purple-400/80 shadow-xl focus:ring-2 focus:ring-purple-400/50 transition-all"
             />
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex bg-white rounded-xl border border-slate-200 p-1 shadow-sm">
+            <div className="flex bg-white/10 backdrop-blur-md rounded-xl border border-purple-400/30 p-1 shadow-lg">
               <button
                 onClick={() => setViewMode('surah')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  viewMode === 'surah' ? 'bg-purple-100 text-purple-700 shadow' : 'text-slate-600 hover:bg-slate-100'
+                  viewMode === 'surah' ? 'bg-purple-500/60 !text-white shadow-lg' : '!text-purple-100 hover:!text-white'
                 }`}
               >
                 By Surah
@@ -337,23 +334,23 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
               <button
                 onClick={() => setViewMode('juz')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  viewMode === 'juz' ? 'bg-purple-100 text-purple-700 shadow' : 'text-slate-600 hover:bg-slate-100'
+                  viewMode === 'juz' ? 'bg-purple-500/60 !text-white shadow-lg' : '!text-purple-100 hover:!text-white'
                 }`}
               >
                 By Juz
               </button>
             </div>
 
-            <div className="flex items-center gap-2 bg-white rounded-xl border border-slate-200 px-4 py-2 shadow-sm">
-              <Filter className="w-4 h-4 text-slate-400" />
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-xl border border-purple-400/30 px-4 py-2 shadow-lg">
+              <Filter className="w-4 h-4 !text-purple-300" />
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value as any)}
-                className="bg-transparent border-none outline-none text-sm text-slate-600"
+                className="bg-transparent border-none outline-none text-sm !text-purple-100"
               >
-                <option value="all" className="bg-white text-slate-900">All Surahs</option>
-                <option value="Meccan" className="bg-white text-slate-900">Meccan Only</option>
-                <option value="Medinan" className="bg-white text-slate-900">Medinan Only</option>
+                <option value="all" className="!bg-purple-900 !text-white">All Surahs</option>
+                <option value="Meccan" className="!bg-purple-900 !text-white">Meccan Only</option>
+                <option value="Medinan" className="!bg-purple-900 !text-white">Medinan Only</option>
               </select>
             </div>
           </div>
@@ -364,32 +361,32 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className={`relative mb-10 rounded-[32px] p-6 md:p-8 shadow-lg overflow-hidden border ${darkMode ? 'bg-gradient-to-br from-slate-800 to-slate-700 text-white border-slate-600' : 'bg-gradient-to-br from-purple-50 to-purple-100 text-slate-900 border-purple-200'}`}
+            className={`relative mb-10 rounded-[32px] p-6 md:p-8 shadow-lg overflow-hidden border bg-gradient-to-br from-purple-600/40 to-purple-900/40 border-purple-400/50`}
           >
-            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(168,85,247,0.2), transparent 60%)' }} />
+            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(168,85,247,0.4), transparent 60%)' }} />
             <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-6">
               <div className="flex-1">
-                <p className="uppercase tracking-[0.35em] text-[11px] text-slate-600 mb-3">
+                <p className="uppercase tracking-[0.35em] text-[11px] !text-purple-200 mb-3">
                   {hasReadingHistory ? 'Continue reading' : 'Start your journey'}
                 </p>
-                <div className="flex flex-wrap items-baseline gap-3 text-slate-900">
-                  <h3 className="text-2xl md:text-3xl font-semibold">{continueSurah.transliteration}</h3>
-                  <span className="text-sm text-slate-700">{continueSurah.name} • {continueSurah.type}</span>
+                <div className="flex flex-wrap items-baseline gap-3 !text-white">
+                  <h3 className="text-2xl md:text-3xl font-semibold !text-white">{continueSurah.transliteration}</h3>
+                  <span className="text-sm !text-purple-100">{continueSurah.name} • {continueSurah.type}</span>
                 </div>
-                <p className="text-sm text-slate-700 mt-2">
+                <p className="text-sm !text-purple-100 mt-2">
                   {hasReadingHistory
                     ? `Ayah ${continueAyah} • ${continueSurah.totalVerses - continueAyah} left in this surah`
                     : 'Pick up from the very first revelation and we will track every ayah you complete.'}
                 </p>
                 {hasReadingHistory && (
                   <div className="mt-5">
-                    <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.3em] text-slate-600 mb-2">
+                    <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.3em] !text-purple-200 mb-2">
                       <span>Progress</span>
                       <span>{lastReadProgress}% complete</span>
                     </div>
-                    <div className="h-1.5 bg-slate-300 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-purple-800/50 rounded-full overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-purple-600 transition-all"
+                        className="h-full rounded-full bg-purple-400 transition-all"
                         style={{ width: `${lastReadProgress}%` }}
                       />
                     </div>
@@ -398,9 +395,9 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
               </div>
               <Button
                 onClick={handleResumeClick}
-                className="bg-purple-600 text-white hover:bg-purple-700 shadow-lg shadow-purple-200 px-6 py-4 rounded-2xl text-base font-semibold flex items-center gap-2"
+                className="bg-purple-500 !text-white hover:bg-purple-600 shadow-lg shadow-purple-500/30 px-6 py-4 rounded-2xl text-base font-semibold flex items-center gap-2"
               >
-                <Play className="w-4 h-4" />
+                <Play className="w-4 h-4 !text-white" />
                 {hasReadingHistory ? 'Resume' : 'Start now'}
               </Button>
             </div>
@@ -408,7 +405,7 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
         )}
 
         {viewMode === 'surah' && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredSurahs.map((surah, index) => {
               const isLastRead = lastRead?.surah === surah.number;
               return (
@@ -417,39 +414,28 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + index * 0.02 }}
-                  whileHover={{ y: -4, scale: 1.01 }}
+                  whileHover={{ scale: 1.02 }}
                   onClick={() => handleOpenSurah(surah)}
-                  className={`relative rounded-2xl p-6 border shadow-md hover:shadow-lg text-left ${darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
+                  className={`relative w-full rounded-2xl p-6 border shadow-md hover:shadow-xl text-center flex flex-col items-center justify-center transition-all bg-white/10 backdrop-blur-md border-purple-400/30 hover:border-purple-400/60 hover:bg-white/15`}
                 >
-                  {isLastRead && (
-                    <span className="absolute top-4 left-4 px-2 py-1 text-[10px] font-semibold rounded-full bg-amber-100 text-amber-700">
-                      In progress
-                    </span>
-                  )}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-medium">
-                      {surah.number}
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center !text-white font-bold text-xl shadow-lg mb-4">
+                    {surah.number}
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-arabic !text-white mb-2" dir="rtl">
+                      {surah.name}
+                    </h3>
+                    <p className="font-semibold !text-white text-lg">{surah.transliteration}</p>
+                    <div className="flex items-center justify-center gap-2">
+                      <span
+                        className={`text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-tight ${
+                          surah.type === 'Meccan' ? 'bg-purple-300/30 !text-purple-100' : 'bg-emerald-400/30 !text-emerald-100'
+                        }`}
+                      >
+                        {surah.type}
+                      </span>
+                      <span className="text-xs !text-purple-200">{surah.totalVerses} Ayahs</span>
                     </div>
-                    <span
-                      className={`text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-tight ${
-                        surah.type === 'Meccan' ? 'bg-slate-100 text-slate-700' : 'bg-emerald-100 text-emerald-700'
-                      }`}
-                    >
-                      {surah.type}
-                    </span>
-                  </div>
-                  <h3 className="text-2xl text-right font-arabic text-slate-900" dir="rtl">
-                    {surah.name}
-                  </h3>
-                  <div className="mt-2">
-                    <p className="font-semibold text-slate-900">{surah.transliteration}</p>
-                    <p className="text-sm text-slate-600">{surah.translation}</p>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200 mt-4">
-                    <span>{surah.totalVerses} Ayahs</span>
-                    <span className="flex items-center gap-1 text-purple-600 font-semibold">
-                      Read <ChevronRight size={14} />
-                    </span>
                   </div>
                 </motion.button>
               );
@@ -465,23 +451,23 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 + index * 0.02 }}
-                className="bg-white rounded-2xl p-6 border border-slate-200 shadow-md text-slate-900"
+                className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-400/30 shadow-md text-white"
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-md font-bold text-xl">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center !text-white shadow-md font-bold text-xl">
                     {juz.number}
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">{juz.name}</h3>
-                    <p className="text-sm text-slate-600">{juz.description}</p>
+                    <h3 className="text-lg font-bold !text-white">{juz.name}</h3>
+                    <p className="text-sm !text-purple-200">{juz.description}</p>
                   </div>
                 </div>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm !text-purple-100">
                   From {juz.startSurah} to {juz.endSurah}
                 </p>
-                <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
+                <div className="mt-4 flex items-center justify-between text-xs !text-purple-200">
                   <span>{juz.totalAyahs} Ayahs</span>
-                  <span className="text-purple-600 font-semibold flex items-center gap-1">
+                  <span className="!text-purple-300 font-semibold flex items-center gap-1">
                     Explore <ChevronRight size={14} />
                   </span>
                 </div>
@@ -490,6 +476,7 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
           </div>
         )}
       </div>
+      )}
 
       <AnimatePresence>
         {readingSurah && (
@@ -498,9 +485,13 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
             surahNameArabic={readingSurah.name}
             surahType={readingSurah.type}
             surahNumber={readingSurah.number}
+            surahTranslation={readingSurah.translation}
             verses={verses}
             onClose={handleCloseReading}
             reciterDisplayName={reciterDisplayName}
+            reciters={reciters}
+            selectedReciterId={selectedReciterId}
+            onReciterChange={setSelectedReciterId}
             isPlaying={isPlaying}
             currentAyahIndex={currentAyahIndex}
             onTogglePlayPause={togglePlayPause}
@@ -511,6 +502,7 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
             bookmarkedAyahs={bookmarkedAyahs}
             onToggleBookmark={toggleBookmark}
             onAudioPlay={playAyahAudio}
+            isLoadingVerses={loading}
           />
         )}
       </AnimatePresence>

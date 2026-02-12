@@ -1,16 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import {
-  Info,
-  ChevronDown,
-  X,
-  Bookmark,
-  Share2,
-  Play,
-  SkipBack,
-  SkipForward,
-  Pause,
-} from 'lucide-react';
+import { Bookmark, Pause, Play, Share2, SkipBack, SkipForward, X } from 'lucide-react';
 
 interface Verse {
   id?: number | string;
@@ -18,6 +8,7 @@ interface Verse {
   text_uthmani?: string;
   arabic?: string;
   translation?: { text?: string } | string;
+  translations?: Array<{ text?: string }>;
   verse_key?: string;
   bookmarked?: boolean;
 }
@@ -27,10 +18,13 @@ interface SurahReaderProps {
   surahNameArabic: string;
   surahType: string;
   surahNumber: number;
+  surahTranslation?: string;
   verses: Verse[];
   onClose: () => void;
   selectedReciterId?: string | number;
   reciterDisplayName?: string;
+  reciters?: Array<{ id: string | number; name: string; server?: string }>;
+  onReciterChange?: (reciterId: string | number) => void;
   onAudioPlay?: (ayahIndex: number) => void;
   isPlaying?: boolean;
   currentAyahIndex?: number | null;
@@ -41,35 +35,26 @@ interface SurahReaderProps {
   onAyahSelect?: (index: number) => void;
   bookmarkedAyahs?: Array<{ surah: number; ayah: number }>;
   onToggleBookmark?: (ayahIndex: number) => void;
+  isLoadingVerses?: boolean;
 }
 
-const defaultVerses: Verse[] = [
-  {
-    id: 1,
-    arabic:
-      'يَٰٓأَيُّهَا ٱلنَّاسُ ٱتَّقُوا۟ رَبَّكُمُ ٱلَّذِى خَلَقَكُم مِّن نَّفْسٍۢ وَٰحِدَةٍۢ وَخَلَقَ مِنْهَا زَوْجَهَا وَبَثَّ مِنْهُمَا رِجَالًۭا كَثِيرًۭا وَنِسَآءًۭ ۚ وَٱتَّقُوا۟ ٱللَّهَ ٱلَّذِى تَسَآءَلُونَ بِهِۦ وَٱلْأَرْحَامَ ۚ إِنَّ ٱللَّهَ كَانَ عَلَيْكُمْ رَقِيبًۭا',
-  },
-  {
-    id: 2,
-    arabic:
-      'وَءَاتُوا۟ ٱلْيَتَٰمَىٰٓ أَمْوَٰلَهُمْ ۖ وَلَا تَتَبَدَّلُوا۟ ٱلْخَبِيثَ بِٱلطَّيِّبِ ۖ وَلَا تَأْكُلُوٓا۟ أَمْوَٰلَهُمْ إِلَىٰٓ أَمْوَٰلِكُمْ ۚ إِنَّهُۥ كَانَ حُوبًۭا كَبِيرًۭا',
-  },
-  {
-    id: 3,
-    arabic:
-      'وَإِنْ خِفْتُمْ أَلَّا تُقْسِطُوا۟ فِى ٱلْيَتَٰمَىٰ فَٱنكِحُوا۟ مَا طَابَ لَكُم مِّنَ ٱلنِّسَآءِ مَثْنَىٰ وَثُلَٰثَ وَرُبَٰعَ ۖ فَإِنْ خِفْتُمْ أَلَّا تَعْدِلُوا۟ فَوَٰحِدَةً أَوْ مَا مَلَكَتْ أَيْمَٰنُكُمْ ۚ ذَٰلِكَ أَدْنَىٰٓ أَلَّا تَعُولُوا۟',
-  },
-  {
-    id: 4,
-    arabic:
-      'وَءَاتُوا۟ ٱلنِّسَآءَ صَدُقَٰتِهِنَّ نِحْلَةًۭ ۚ فَإِن طِبْنَ لَكُمْ عَن شَىْءٍۢ مِّنْهُ نَفْسًۭا فَكُلُوهُ هَنِيٓـًۭٔا مَّرِيٓـًۭٔا',
-  },
-];
+const placeholderVerses: Verse[] = Array.from({ length: 7 }, (_, index) => ({ id: `placeholder-${index}` }));
+
+const stripHtml = (value: string) => value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
 const getAyahTranslation = (verse: Verse): string => {
   if (!verse) return '';
-  if (typeof verse.translation === 'object' && verse.translation?.text) return verse.translation.text;
-  if (typeof verse.translation === 'string') return verse.translation;
+  const candidates: Array<string | undefined> = [];
+  if (typeof verse.translation === 'object') candidates.push(verse.translation?.text);
+  if (typeof verse.translation === 'string') candidates.push(verse.translation);
+  if (Array.isArray(verse.translations) && verse.translations.length) {
+    candidates.push(verse.translations[0]?.text);
+  }
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    const clean = stripHtml(candidate);
+    if (clean) return clean;
+  }
   return '';
 };
 
@@ -83,9 +68,13 @@ export function SurahReader({
   surahNameArabic,
   surahType,
   surahNumber,
+  surahTranslation,
   verses,
   onClose,
   reciterDisplayName = 'Al-Husary',
+  reciters = [],
+  selectedReciterId,
+  onReciterChange,
   isPlaying,
   currentAyahIndex = 0,
   onTogglePlayPause,
@@ -96,12 +85,38 @@ export function SurahReader({
   onAyahSelect,
   bookmarkedAyahs = [],
   onToggleBookmark,
+  isLoadingVerses = false,
 }: SurahReaderProps) {
   const [localBookmarks, setLocalBookmarks] = useState<Set<number>>(new Set());
   const [localPlayState, setLocalPlayState] = useState(false);
-  const [isBrowser, setIsBrowser] = useState(false);
+  const [showReciterMenu, setShowReciterMenu] = useState(false);
+  const [expandedTranslations, setExpandedTranslations] = useState<Set<number>>(new Set());
+  const [expandedTafsir, setExpandedTafsir] = useState<Set<number>>(new Set());
 
-  // Lock body scroll while the reader is open
+  const toggleTranslation = (index: number) => {
+    setExpandedTranslations((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  };
+
+  const toggleTafsir = (index: number) => {
+    setExpandedTafsir((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  };
+
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     const originalPosition = document.body.style.position;
@@ -121,11 +136,8 @@ export function SurahReader({
     };
   }, []);
 
-  useEffect(() => {
-    setIsBrowser(true);
-  }, []);
-
-  const versesToRender = verses?.length ? verses : defaultVerses;
+  const shouldRenderPlaceholders = !verses?.length;
+  const versesToRender = shouldRenderPlaceholders ? placeholderVerses : verses;
   const safeActiveIndex = useMemo(() => {
     if (!versesToRender.length) return 0;
     if (currentAyahIndex == null) return 0;
@@ -133,28 +145,31 @@ export function SurahReader({
   }, [versesToRender, currentAyahIndex]);
 
   const isBookmarked = (index: number) => {
+    if (shouldRenderPlaceholders) return false;
+    const verseNumber = index + 1;
     if (bookmarkedAyahs.length && surahNumber) {
-      return bookmarkedAyahs.some((b) => b.surah === surahNumber && b.ayah === index + 1);
+      return bookmarkedAyahs.some((b) => b.surah === surahNumber && b.ayah === verseNumber);
     }
-    return localBookmarks.has(index + 1);
+    return localBookmarks.has(verseNumber);
   };
 
   const handleBookmarkToggle = (index: number) => {
-    if (onToggleBookmark) {
-      onToggleBookmark(index);
-      return;
+    if (shouldRenderPlaceholders) return;
+    const verseNumber = index + 1;
+
+    if (!bookmarkedAyahs.length || !surahNumber) {
+      setLocalBookmarks((prev) => {
+        const next = new Set(prev);
+        if (next.has(verseNumber)) {
+          next.delete(verseNumber);
+        } else {
+          next.add(verseNumber);
+        }
+        return next;
+      });
     }
 
-    setLocalBookmarks((prev) => {
-      const next = new Set(prev);
-      const verseNumber = index + 1;
-      if (next.has(verseNumber)) {
-        next.delete(verseNumber);
-      } else {
-        next.add(verseNumber);
-      }
-      return next;
-    });
+    onToggleBookmark?.(index);
   };
 
   const handleVerseSelect = (index: number) => {
@@ -181,204 +196,198 @@ export function SurahReader({
   };
 
   const handleNext = () => {
-    if (onPlayNext) {
-      onPlayNext();
-    }
+    if (onPlayNext) onPlayNext();
   };
 
   const handlePrevious = () => {
-    if (onPlayPrevious) {
-      onPlayPrevious();
-    }
+    if (onPlayPrevious) onPlayPrevious();
   };
 
-  const showBismillah = surahNumber !== 1 && surahNumber !== 9;
+  const handleShareVerse = useCallback(
+    async (index: number) => {
+      if (shouldRenderPlaceholders) return;
+      const verse = versesToRender[index];
+      if (!verse) return;
 
-  if (!isBrowser || typeof document === 'undefined') {
-    return null;
-  }
+      const arabicText = getAyahText(verse);
+      const translationText = getAyahTranslation(verse);
+      const payload = `${surahName} • Ayah ${index + 1}\n${arabicText}\n${translationText}`.trim();
+
+      try {
+        if (typeof navigator !== 'undefined' && navigator.share) {
+          await navigator.share({ title: `${surahName} – Ayah ${index + 1}`, text: payload });
+          return;
+        }
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+          await navigator.clipboard.writeText(payload);
+        }
+      } catch (error) {
+        console.warn('Unable to share ayah', error);
+      }
+    },
+    [shouldRenderPlaceholders, versesToRender, surahName]
+  );
+
+  const showBismillah = surahNumber !== 9;
+  const verseCountDisplay = verses && verses.length ? `${verses.length} Ayahs` : 'Loading…';
+  const controlButtonBase =
+    'flex items-center justify-center rounded-full bg-white/15 text-white transition-all duration-200 hover:bg-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-50 disabled:cursor-not-allowed';
+  const backgroundGradient = 'linear-gradient(160deg, #5f0bbf 0%, #3a0d5c 55%, #19062d 100%)';
+  const glowOverlay =
+    'radial-gradient(circle at 15% 20%, rgba(255,255,255,0.2), transparent 50%), radial-gradient(circle at 80% 0%, rgba(255,255,255,0.12), transparent 40%)';
+  const iconButtonBase =
+    'flex h-11 w-11 items-center justify-center rounded-full border border-white/18 bg-white/5 text-white/80 transition-colors duration-200 hover:bg-white/15';
+  const cardBaseClasses =
+    'group relative rounded-3xl border border-white/12 bg-white/4 backdrop-blur-xl px-8 py-10 sm:px-12 sm:py-12 shadow-[0_20px_70px_rgba(8,0,38,0.55)] transition-all duration-300';
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] overflow-hidden bg-gradient-to-br from-[#080017] via-[#1d0140] to-[#05000c] text-white">
-      <div className="flex h-full flex-col">
-        {/* Header */}
-        <header className="px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between border-b border-white/10 bg-white/5 backdrop-blur">
-          <div className="flex items-center gap-3">
+    <div className="fixed inset-0 z-[100000] flex flex-col text-white" style={{ backgroundImage: backgroundGradient }}>
+      <div className="pointer-events-none absolute inset-0 opacity-70" style={{ backgroundImage: glowOverlay }} />
+      <div className="relative z-[1] flex h-full flex-col">
+        <header className="flex flex-col gap-4 px-5 py-6 border-b border-white/10 sm:flex-row sm:items-center sm:gap-8 sm:px-10">
+          <div className="flex items-center gap-4">
             <button
               onClick={onClose}
-              className="text-white/80 hover:text-white transition-colors"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/5 text-white/80 transition hover:text-white"
+              aria-label="Close reader"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
-            <div className="text-white">
-              <h1 className="text-lg font-semibold sm:text-xl">{surahName}</h1>
-              <p className="text-xs text-purple-200/70 sm:text-sm">
-                {surahNameArabic} • {surahType}
-              </p>
+            <div className="space-y-1 text-left">
+              <p className="reader-sans text-[0.65rem] uppercase tracking-[0.45em] text-white/60">{surahType}</p>
+              <p className="reader-sans text-xl font-semibold text-white leading-tight">{surahName}</p>
+              <p className="font-arabic text-2xl text-white leading-tight">{surahNameArabic}</p>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button className="text-white/80 hover:text-white transition-colors">
-              <ChevronDown className="w-5 h-5" />
-            </button>
-            <button className="text-white/80 hover:text-white transition-colors">
-              <Info className="w-5 h-5" />
-            </button>
           </div>
         </header>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto px-4 py-6 pb-48 sm:px-6 sm:py-8 sm:pb-56">
-          <div className="max-w-3xl mx-auto sm:max-w-4xl">
-            {/* Bismillah */}
+        <main className="flex-1 overflow-y-auto px-4 py-12 pb-16 sm:px-10 sm:py-16 sm:pb-20">
+          <div className="mx-auto w-full max-w-5xl">
+            <section className="text-center space-y-6 mb-16">
+              <p className="reader-sans text-[0.7rem] uppercase tracking-[0.6em] text-white/50">{surahType} • {verseCountDisplay}</p>
+              <p className="reader-display text-5xl sm:text-7xl md:text-8xl text-white leading-tight">{surahName}</p>
+              <p className="font-arabic text-5xl sm:text-6xl md:text-7xl text-white leading-relaxed">{surahNameArabic}</p>
+              <p className="reader-sans text-xl sm:text-2xl text-white/60 mt-8">{surahTranslation || 'Reflect on every ayah with clarity.'}</p>
+            </section>
+
             {showBismillah && (
-              <div className="text-center mb-12">
-                <div className="inline-block px-6 py-5 sm:px-8 sm:py-6 bg-gradient-to-r from-purple-900/40 via-purple-800/60 to-purple-900/40 rounded-2xl backdrop-blur-sm border border-purple-600/30 shadow-xl">
-                  <p className="text-2xl sm:text-3xl md:text-4xl text-white font-arabic leading-loose tracking-wide">
-                    بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
-                  </p>
+              <div className="mt-16 mb-16 flex justify-center">
+                <div className="inline-flex items-center rounded-2xl border border-white/20 bg-white/8 px-12 py-6 text-3xl sm:text-4xl font-arabic shadow-[0_20px_70px_rgba(12,0,45,0.55)]">
+                  بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
                 </div>
               </div>
             )}
 
-            {/* Verses */}
-            <div className="space-y-4 sm:space-y-6">
-              {versesToRender.length === 0 && (
-                <div className="text-center py-10 text-purple-100/70 text-lg">Loading verses...</div>
+            <section className="mt-16 space-y-10">
+              {shouldRenderPlaceholders && isLoadingVerses && (
+                <p className="text-center text-sm uppercase tracking-[0.4em] text-white/60">Loading verses…</p>
               )}
 
               {versesToRender.map((verse, index) => {
                 const verseNumber = index + 1;
-                const translation = getAyahTranslation(verse);
+                const translation = shouldRenderPlaceholders
+                  ? 'Translation loading…'
+                  : getAyahTranslation(verse) || 'Translation coming soon.';
+                const ayahArabic = shouldRenderPlaceholders ? '...' : getAyahText(verse);
                 const isActive = index === safeActiveIndex;
-                const bookmarked = isBookmarked(index) || Boolean(verse.bookmarked);
+                const bookmarked = isBookmarked(index) || Boolean(verse?.bookmarked);
+                const cardElevation = isActive ? 'border-purple-400/50 bg-[#5313a0]/20 scale-[1.01]' : 'hover:border-white/20';
 
                 return (
                   <div
-                    key={`${verse.verse_key || verse.id || index}`}
-                    className={`group relative bg-gradient-to-br from-purple-900/30 via-purple-800/20 to-purple-900/30 backdrop-blur-md rounded-2xl p-6 sm:p-8 border transition-all duration-300 hover:shadow-xl hover:shadow-purple-900/30 ${
-                      isActive
-                        ? 'border-purple-500/70 shadow-purple-800/40'
-                        : 'border-purple-700/20 hover:border-purple-600/40'
-                    }`}
+                    key={`${verse?.verse_key || verse?.id || index}`}
+                    className={`${cardBaseClasses} ${cardElevation}`}
                     onClick={() => handleVerseSelect(index)}
                   >
-                    <div className="absolute -top-3 left-6 sm:left-8">
-                      <div className={`text-white w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg border-2 border-purple-900 ${
-                        isActive ? 'bg-gradient-to-br from-purple-400 to-purple-600' : 'bg-gradient-to-br from-purple-600 to-purple-700'
-                      }`}>
-                        <span className="font-semibold text-sm sm:text-base">{verseNumber}</span>
+                    <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                      <div className="flex flex-1 items-start gap-5">
+                        <div className="relative pt-1">
+                          <div
+                            className={`flex h-12 w-12 items-center justify-center rounded-full text-base font-semibold shadow-lg sm:h-14 sm:w-14 ${
+                              isActive ? 'bg-[#5313a0] text-white' : 'bg-white/15 text-white'
+                            } ${bookmarked ? 'ring-2 ring-yellow-200/70' : ''}`}
+                          >
+                            {verseNumber}
+                          </div>
+                          <span className="pointer-events-none absolute left-1/2 top-full hidden h-11 w-px -translate-x-1/2 translate-y-2 bg-white/25 md:block" />
+                        </div>
+                        <div className="space-y-5">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleTranslation(index);
+                              }}
+                              className="reader-sans text-[0.6rem] uppercase tracking-[0.35em] font-semibold px-4 py-2 rounded-full border border-white/25 bg-white/6 text-white/70 transition-all hover:border-white/50 hover:bg-white/12 hover:text-white/90"
+                            >
+                              {expandedTranslations.has(index) ? '✓ Translation' : 'See Translation'}
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleTafsir(index);
+                              }}
+                              className="reader-sans text-[0.6rem] uppercase tracking-[0.35em] font-semibold px-4 py-2 rounded-full border border-white/25 bg-white/6 text-white/70 transition-all hover:border-white/50 hover:bg-white/12 hover:text-white/90"
+                            >
+                              {expandedTafsir.has(index) ? '✓ Tafsir' : 'See Tafsir'}
+                            </button>
+                          </div>
+                          {expandedTranslations.has(index) && (
+                            <p className="reader-sans text-lg leading-relaxed text-white/85 sm:text-xl mt-5 pt-5 border-t border-white/10">{translation}</p>
+                          )}
+                          {expandedTafsir.has(index) && (
+                            <p className="reader-sans text-base leading-relaxed text-white/75 mt-5 pt-5 border-t border-white/10 italic">Tafsir (Ibn Kathir): [Detailed explanation would load here based on ayah data]</p>
+                          )}
+                          <div className="flex items-center gap-3 mt-6 pt-4 border-t border-white/10">
+                            <button
+                              aria-label="Play ayah audio"
+                              className={iconButtonBase}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleVersePlay(index);
+                              }}
+                              disabled={shouldRenderPlaceholders}
+                            >
+                              <Play className="h-4 w-4" />
+                            </button>
+                            <button
+                              aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark ayah'}
+                              className={`${iconButtonBase} ${bookmarked ? 'text-yellow-200 border-yellow-200/60' : ''}`}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleBookmarkToggle(index);
+                              }}
+                              disabled={shouldRenderPlaceholders}
+                            >
+                              <Bookmark className="h-4 w-4" />
+                            </button>
+                            <button
+                              aria-label="Share ayah"
+                              className={iconButtonBase}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleShareVerse(index);
+                              }}
+                              disabled={shouldRenderPlaceholders}
+                            >
+                              <Share2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="mt-4 mb-6">
-                      <p className="text-white text-xl sm:text-2xl md:text-3xl leading-loose text-right font-arabic tracking-wide">
-                        {getAyahText(verse)}
+                      <p className="font-arabic text-4xl leading-[2.2] text-white sm:text-5xl md:text-6xl md:max-w-[50%] text-right">
+                        {ayahArabic}
                       </p>
-                    </div>
-
-                    {translation && (
-                      <div className="mb-4 pb-4 border-b border-purple-700/20">
-                        <p className="text-purple-100/80 text-sm leading-relaxed sm:text-base">{translation}</p>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-end gap-1.5 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleBookmarkToggle(index);
-                        }}
-                        className={`p-2 rounded-full transition-all duration-200 backdrop-blur-sm sm:p-2.5 ${
-                          bookmarked
-                            ? 'bg-purple-600/60 text-yellow-300'
-                            : 'bg-purple-800/40 hover:bg-purple-700/60 text-purple-100 hover:text-white'
-                        }`}
-                      >
-                        <Bookmark className={`w-4 h-4 ${bookmarked ? 'fill-current' : ''}`} />
-                      </button>
-                      <button
-                        onClick={(event) => event.stopPropagation()}
-                        className="p-2 rounded-full bg-purple-800/40 hover:bg-purple-700/60 text-purple-100 hover:text-white transition-all duration-200 backdrop-blur-sm sm:p-2.5"
-                      >
-                        <Share2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleVersePlay(index);
-                        }}
-                        className="p-2 rounded-full bg-purple-800/40 hover:bg-purple-700/60 text-purple-100 hover:text-white transition-all duration-200 backdrop-blur-sm sm:p-2.5"
-                      >
-                        <Play className="w-4 h-4" />
-                      </button>
                     </div>
                   </div>
                 );
               })}
-            </div>
+            </section>
           </div>
         </main>
 
-        {/* Audio Player */}
-        <div className="pointer-events-auto fixed inset-x-0 bottom-0 z-[10000] px-4 pb-5 sm:px-6 sm:pb-6">
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-gradient-to-r from-purple-950/95 via-purple-900/95 to-purple-950/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-purple-600/30 px-4 py-4 sm:px-8 sm:py-5">
-              <div className="flex items-center justify-between gap-4 sm:gap-6">
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-white text-sm font-semibold truncate sm:text-base">
-                    {surahName} - Ayah {safeActiveIndex + 1}
-                  </h3>
-                  <p className="text-purple-200/70 text-xs truncate sm:text-sm">{reciterDisplayName}</p>
-                </div>
 
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handlePrevious}
-                    disabled={isAudioLoading}
-                    className="p-2 rounded-full text-purple-200 hover:text-white hover:bg-purple-800/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <SkipBack className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </button>
-
-                  <button
-                    onClick={handleTogglePlay}
-                    disabled={isAudioLoading}
-                    className="p-3 rounded-full bg-gradient-to-br from-purple-600 to-purple-700 text-white hover:from-purple-500 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-purple-600/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed sm:p-4"
-                  >
-                    {playState ? (
-                      <Pause className="w-5 h-5 sm:w-6 sm:h-6" />
-                    ) : (
-                      <Play className="w-5 h-5 sm:w-6 sm:h-6" />
-                    )}
-                  </button>
-
-                  <button
-                    onClick={handleNext}
-                    disabled={isAudioLoading}
-                    className="p-2 rounded-full text-purple-200 hover:text-white hover:bg-purple-800/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <SkipForward className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="mt-3 sm:mt-4">
-                <div className="h-1 bg-purple-950/60 rounded-full overflow-hidden sm:h-1.5">
-                  <div
-                    className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full shadow-lg shadow-purple-500/50 transition-all duration-300"
-                    style={{
-                      width: versesToRender.length
-                        ? `${((safeActiveIndex + 1) / versesToRender.length) * 100}%`
-                        : '0%',
-                    }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>,
     document.body
