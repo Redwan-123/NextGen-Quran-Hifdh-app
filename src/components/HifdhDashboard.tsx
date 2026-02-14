@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Target, Flame, TrendingUp, Zap, Mic, BookOpen, Search, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Brain, Target, Flame, TrendingUp, Zap, Mic, BookOpen, Search, RefreshCw, AlertCircle, CheckCircle2, Sparkles } from 'lucide-react';
 import { Progress } from './ui/progress';
 import { Button } from './ui/button';
 import { mockUserProgress } from '../data/mockData';
@@ -11,7 +11,6 @@ interface HifdhDashboardProps {
 }
 
 export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
-  // --- State Configuration ---
   const [selectedSurah, setSelectedSurah] = useState<Surah>(allSurahs[0]);
   const [activeAyahs, setActiveAyahs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -22,15 +21,14 @@ export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
   const [sessionMistakes, setSessionMistakes] = useState<{ ayah: number, error: string }[]>([]);
   const [practicePlan, setPracticePlan] = useState<string[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState('Focus on tajweed for today, tighten rhythm, then test with random ayahs.');
   
   const [recitationFeedback, setRecitationFeedback] = useState({
     rhythm: 85,
     pitch: 78,
-    confidence: 92,
+    confidence: 82,
   });
 
-  // --- API Fetch Logic ---
+
   useEffect(() => {
     const fetchSurahContent = async () => {
       setLoading(true);
@@ -52,12 +50,10 @@ export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
     fetchSurahContent();
   }, [selectedSurah]);
 
-  // --- Handlers ---
   const handleNextAyah = (hasMistake: boolean, errorMsg?: string) => {
     if (hasMistake && errorMsg) {
       setSessionMistakes(prev => [...prev, { ayah: currentAyahIndex + 1, error: errorMsg }]);
     }
-    
     if (currentAyahIndex < activeAyahs.length - 1) {
       setCurrentAyahIndex(prev => prev + 1);
     } else {
@@ -73,42 +69,24 @@ export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
   const generatePlan = () => {
     setAiLoading(true);
     setTimeout(() => {
-      const mistakesSummary = sessionMistakes.length > 0
-        ? `Review ayahs ${sessionMistakes.map(m => m.ayah).join(', ')}`
-        : 'Start with a warm-up recitation';
       const plan = [
-        `${mistakesSummary} in ${selectedSurah.transliteration} using slow tempo.`,
-        `Shadow recite Ayah ${currentAyahIndex + 1} with a trusted qari, then record yourself.`,
-        'Drill one maqam for 5 minutes, then switch to natural voice to check clarity.',
-        'Finish with a closed-book recall of 3 ayahs and mark any hesitations.',
+        'Review ayahs with emphasis on tajweed rules.',
+        'Practice long vowels (Madh) for 5 minutes.',
+        'Record yourself and compare with professional reciter.',
       ];
       setPracticePlan(plan);
       setAiLoading(false);
     }, 600);
   };
 
-  // --- Completion View ---
+
   if (isFinished) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center p-6">
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 max-w-2xl w-full">
-          <h2 className="text-3xl font-bold text-slate-900 mb-2">Recitation Complete</h2>
-          <p className="text-slate-500 mb-8">Summary for Surah {selectedSurah.transliteration}</p>
-          <div className="space-y-4 mb-8">
-            {sessionMistakes.length === 0 ? (
-              <div className="p-6 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center gap-4">
-                <CheckCircle2 size={32} /> <span className="font-bold">Perfect recitation! Masha'Allah.</span>
-              </div>
-            ) : (
-              sessionMistakes.map((m, i) => (
-                <div key={i} className="p-4 bg-red-50 text-red-700 rounded-xl flex gap-3 border border-red-100">
-                  <AlertCircle size={20} className="mt-1 flex-shrink-0" />
-                  <p className="text-sm"><span className="font-bold">Ayah {m.ayah}:</span> {m.error}</p>
-                </div>
-              ))
-            )}
-          </div>
-          <Button onClick={() => { setIsFinished(false); setCurrentAyahIndex(0); setSessionMistakes([]); }} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-14 rounded-2xl">
+      <div className={`min-h-screen flex items-center justify-center p-6 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-slate-100'}`}>
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className={`p-8 rounded-3xl shadow-2xl border max-w-2xl w-full ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}>
+          <h2 className={`text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Session Complete</h2>
+          <p className={`mb-8 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Summary for Surah {selectedSurah.transliteration}</p>
+          <Button onClick={() => { setIsFinished(false); setCurrentAyahIndex(0); setSessionMistakes([]); }} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-14 rounded-2xl font-bold">
             <RefreshCw className="mr-2 w-5 h-5" /> Start New Session
           </Button>
         </motion.div>
@@ -117,88 +95,108 @@ export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50'}`}>
-      <div className="max-w-7xl mx-auto px-6 pb-8">
+    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-slate-50'}`}>
+      <div className={`max-w-7xl mx-auto px-3 md:px-6 pb-8 pt-4`}>
         
-        {/* Statistics Header (Your original stats) */}
-        <div className="grid md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-lg">
-            <Flame className="w-8 h-8 mb-2" />
-            <span className="text-3xl font-bold block">{mockUserProgress.streakDays}</span>
-            <p className="text-sm opacity-90 font-medium">Day Streak</p>
+        {/* Header with Title and Button */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className={`text-3xl md:text-4xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>Smart Hifdh Practice</h1>
+            <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>AI-Powered Smart Trial Repository Analysis</p>
           </div>
-          <div className="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl p-6 text-white shadow-lg">
-            <Target className="w-8 h-8 mb-2" />
-            <span className="text-3xl font-bold block">{mockUserProgress.memorizedAyahs.length}</span>
-            <p className="text-sm opacity-90 font-medium">Ayahs Memorized</p>
-          </div>
-          <div className="bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl p-6 text-white shadow-lg">
-            <TrendingUp className="w-8 h-8 mb-2" />
-            <span className="text-3xl font-bold block">{mockUserProgress.masteryPercentage}%</span>
-            <p className="text-sm opacity-90 font-medium">Overall Mastery</p>
-          </div>
-          <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-6 text-white shadow-lg">
-            <Brain className="w-8 h-8 mb-2" />
-            <span className="text-3xl font-bold block">{mockUserProgress.weakLinks.length}</span>
-            <p className="text-sm opacity-90 font-medium">Weak Links</p>
-          </div>
+          <Button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 h-10 rounded-xl font-bold text-sm">
+            Finish Session
+          </Button>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
+          <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-4 md:p-6 text-white shadow-lg">
+            <Flame className="w-6 h-6 md:w-8 md:h-8 mb-2" />
+            <span className="text-2xl md:text-3xl font-bold block">7</span>
+            <p className="text-xs md:text-sm opacity-90 font-medium">Day Streak</p>
+          </motion.div>
+          <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} transition={{delay: 0.1}} className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-4 md:p-6 text-white shadow-lg">
+            <Target className="w-6 h-6 md:w-8 md:h-8 mb-2" />
+            <span className="text-2xl md:text-3xl font-bold block">3</span>
+            <p className="text-xs md:text-sm opacity-90 font-medium">Ayahs Memorized</p>
+          </motion.div>
+          <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} transition={{delay: 0.2}} className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-4 md:p-6 text-white shadow-lg">
+            <TrendingUp className="w-6 h-6 md:w-8 md:h-8 mb-2" />
+            <span className="text-2xl md:text-3xl font-bold block">50%</span>
+            <p className="text-xs md:text-sm opacity-90 font-medium">Overall Mastery</p>
+          </motion.div>
+          <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} transition={{delay: 0.3}} className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-4 md:p-6 text-white shadow-lg">
+            <Brain className="w-6 h-6 md:w-8 md:h-8 mb-2" />
+            <span className="text-2xl md:text-3xl font-bold block">2</span>
+            <p className="text-xs md:text-sm opacity-90 font-medium">Weak Links</p>
+          </motion.div>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-4 md:gap-6">
+          {/* Main Practice Area */}
+          <div className="lg:col-span-2 space-y-4 md:space-y-6">
             
-            {/* Visual Recitation Practice Area (Your original Practice UI) */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/50">
-              <div className="flex justify-between items-start mb-6">
+            {/* Practice Session Card */}
+            <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} className={`rounded-3xl p-4 md:p-8 shadow-xl border ${darkMode ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-200'}`}>
+              <div className="flex justify-between items-start mb-4 md:mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-800">Practice Session</h2>
-                  <p className="text-slate-500">Currently Reading: {selectedSurah.transliteration} (Ayah {currentAyahIndex + 1})</p>
+                  <h2 className={`text-lg md:text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>Currently Reading</h2>
+                  <p className={`text-xs md:text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>{selectedSurah.transliteration} (Ayah {currentAyahIndex + 1})</p>
                 </div>
-                <div onClick={() => setIsRecording(!isRecording)} className="cursor-pointer">
-                   <Mic className={`${isRecording ? 'text-red-500 animate-pulse' : 'text-slate-300'} w-8 h-8`} />
-                </div>
+                <Mic className={`${isRecording ? 'text-red-500 animate-pulse' : 'text-slate-400'} w-6 h-6 md:w-8 md:h-8 cursor-pointer`} onClick={() => setIsRecording(!isRecording)} />
               </div>
 
-              <div className="mb-8 p-10 bg-slate-900 rounded-3xl min-h-[300px] flex flex-col items-center justify-center shadow-inner relative overflow-hidden">
+              <div className="mb-6 md:mb-8 p-6 md:p-10 bg-slate-900 rounded-3xl min-h-[200px] md:min-h-[300px] flex items-center justify-center">
                 {loading ? (
-                  <div className="text-indigo-400 font-bold animate-pulse text-xl font-arabic">Loading...</div>
+                  <div className="text-purple-400 font-bold animate-pulse">Loading...</div>
                 ) : (
                   <AnimatePresence mode="wait">
-                    <motion.p key={currentAyahIndex} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="text-4xl text-white text-center leading-[2.2] font-arabic" dir="rtl">
+                    <motion.p key={currentAyahIndex} initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className="text-3xl md:text-5xl text-white text-center leading-loose font-arabic" dir="rtl">
                       {activeAyahs[currentAyahIndex]?.text_uthmani}
                     </motion.p>
                   </AnimatePresence>
                 )}
+                <p className={`text-xs md:text-sm text-white/40 absolute bottom-4 right-4`}>In the name of Allah, the Most Gracious, the Most Merciful</p>
               </div>
 
-              {/* Feedback Section */}
-              <div className="grid grid-cols-3 gap-6 mb-8">
-                {Object.entries(recitationFeedback).map(([label, value]) => (
-                    <div key={label}>
-                      <div className="flex justify-between text-[10px] uppercase font-bold text-slate-400 mb-2">
-                        <span>{label}</span>
-                        <span>{value}%</span>
-                      </div>
-                      <Progress value={value} className="h-2" />
+              {/* Feedback Metrics */}
+              <div className="grid grid-cols-3 gap-3 md:gap-6 mb-6 md:mb-8">
+                {[
+                  { label: 'Rhythm', value: 85 },
+                  { label: 'Pitch', value: 78 },
+                  { label: 'Confidence', value: 82 },
+                ].map((item) => (
+                  <div key={item.label}>
+                    <div className="flex justify-between text-[9px] md:text-[11px] font-bold uppercase mb-2">
+                      <span className={darkMode ? 'text-slate-400' : 'text-slate-500'}>{item.label}</span>
+                      <span className={darkMode ? 'text-slate-300' : 'text-slate-700'}>{item.value}%</span>
                     </div>
+                    <div className={`h-2 rounded-full ${darkMode ? 'bg-slate-700' : 'bg-slate-200'}`}>
+                      <div className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full" style={{width: `${item.value}%`}}></div>
+                    </div>
+                  </div>
                 ))}
               </div>
 
-              {/* Control Buttons (Backend logic integrated here) */}
-              <div className="flex gap-4">
-                <Button onClick={() => handleNextAyah(false)} className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white h-12 rounded-xl font-bold">
-                  Correct
+              {/* Action Buttons */}
+              <div className="grid grid-cols-3 gap-2 md:gap-4">
+                <Button onClick={() => handleNextAyah(false)} className="bg-purple-600 hover:bg-purple-700 text-white h-10 md:h-12 rounded-xl font-bold text-xs md:text-base">
+                  ✓ Correct
                 </Button>
-                <Button onClick={() => handleNextAyah(true, "Pronunciation error detected")} className="flex-1 bg-red-500 hover:bg-red-600 text-white h-12 rounded-xl font-bold">
-                  Mistake
+                <Button onClick={() => handleNextAyah(true, "error")} className="bg-red-500 hover:bg-red-600 text-white h-10 md:h-12 rounded-xl font-bold text-xs md:text-base">
+                  ✗ Mistake
+                </Button>
+                <Button onClick={() => handleNextAyah(false)} className="bg-blue-500 hover:bg-blue-600 text-white h-10 md:h-12 rounded-xl font-bold text-xs md:text-base">
+                  → Next
                 </Button>
               </div>
             </motion.div>
 
-            {/* Surah Selection Grid (Your original Card UI) */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            {/* Surah Selection */}
+            <div>
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-4 mb-4">
+                <h3 className={`text-lg md:text-xl font-bold flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                   <BookOpen className="w-5 h-5 text-indigo-600" /> Select Surah
                 </h3>
                 <div className="relative">
@@ -206,84 +204,92 @@ export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
                   <input 
                     type="text" 
                     placeholder="Search surahs..." 
-                    className="pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none bg-white/50"
+                    className={`pl-9 pr-4 py-2 border rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-indigo-500 outline-none ${darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className={`grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 max-h-[350px] overflow-y-auto pr-2 ${darkMode ? 'custom-scrollbar-dark' : 'custom-scrollbar'}`}>
                 {filteredSurahs.map((surah: Surah) => (
                   <motion.div
                     key={surah.number}
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{scale: 1.02}}
                     onClick={() => setSelectedSurah(surah)}
-                    className={`cursor-pointer p-5 rounded-2xl border-2 transition-all ${
+                    className={`cursor-pointer p-3 md:p-5 rounded-2xl border-2 transition-all text-xs md:text-sm ${
                       selectedSurah.number === surah.number 
-                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-indigo-200 shadow-xl' 
-                        : 'bg-white border-slate-100 hover:border-indigo-300'
+                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg' 
+                        : darkMode 
+                        ? 'bg-slate-800/50 border-slate-700 hover:border-indigo-500'
+                        : 'bg-white border-slate-200 hover:border-indigo-300'
                     }`}
                   >
-                    <div className="flex justify-between items-start mb-2">
-                      <span className={`text-xs font-bold px-2 py-1 rounded-md ${selectedSurah.number === surah.number ? 'bg-white/20' : 'bg-slate-50 text-slate-500'}`}>
-                        {surah.number}
-                      </span>
-                      <span className="font-arabic text-lg">{surah.name}</span>
-                    </div>
-                    <h4 className="font-bold truncate text-sm">{surah.transliteration}</h4>
-                    <p className={`text-[10px] mt-1 ${selectedSurah.number === surah.number ? 'text-indigo-100' : 'text-slate-400'}`}>
-                      {surah.totalVerses} Ayahs • {surah.type}
+                    <div className="font-bold">{surah.number}. {surah.transliteration}</div>
+                    <p className={`text-[8px] md:text-[10px] mt-1 ${selectedSurah.number === surah.number ? 'text-indigo-100' : darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                      {surah.totalVerses} Ayahs
                     </p>
                   </motion.div>
                 ))}
               </div>
             </div>
+          </div>
 
-            {/* AI Practice Helper */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white/85 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/60">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-800">AI Practice Prompt</h3>
-                  <p className="text-sm text-slate-500">Auto-generate a focused drill for this session.</p>
-                </div>
-                <Button onClick={generatePlan} disabled={aiLoading} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 h-11 rounded-xl">
-                  {aiLoading ? 'Thinking…' : 'Generate Plan'}
-                </Button>
-              </div>
-              <textarea
-                value={aiPrompt}
-                onChange={(e) => setAiPrompt(e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 p-4 text-sm text-slate-700 bg-white/80 focus:ring-2 focus:ring-indigo-200 outline-none mb-4"
-                rows={3}
-              />
-              <div className="space-y-3">
-                {(practicePlan.length ? practicePlan : [aiPrompt]).map((line, idx) => (
-                  <div key={idx} className="p-3 rounded-2xl bg-indigo-50 text-indigo-800 text-sm border border-indigo-100">
-                    {line}
+          {/* Right Sidebar */}
+          <div className="space-y-4 md:space-y-6">
+            
+            {/* Quick Review */}
+            <motion.div initial={{opacity: 0, x: 20}} animate={{opacity: 1, x: 0}} className={`rounded-3xl p-4 md:p-6 shadow-xl border ${darkMode ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-200'}`}>
+              <h3 className={`font-bold mb-4 md:mb-6 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                <Zap className="text-amber-500 w-5 h-5" /> Quick Review
+              </h3>
+              <div className="space-y-2 md:space-y-4">
+                {['Audit 2', 'Audit 3'].map((item, i) => (
+                  <div key={i} className={`p-3 md:p-4 rounded-2xl group cursor-pointer transition-all border ${darkMode ? 'bg-slate-800/50 border-slate-700 hover:border-indigo-500' : 'bg-slate-50 border-slate-200 hover:border-indigo-300'}`}>
+                    <p className={`text-xs md:text-sm font-bold mb-1 ${darkMode ? 'text-slate-300 group-hover:text-indigo-400' : 'text-slate-700 group-hover:text-indigo-600'}`}>{item}</p>
+                    <p className={`text-[9px] md:text-[10px] italic ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>As required and thorough</p>
                   </div>
                 ))}
               </div>
             </motion.div>
-          </div>
 
-          {/* Practice Queue Sidebar (Your original Sidebar) */}
-          <div className="space-y-6">
-            <div className="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-lg border border-slate-100">
-              <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <Zap className="text-amber-500 w-5 h-5" /> Quick Review
+            {/* AI Insights */}
+            <motion.div initial={{opacity: 0, x: 20}} animate={{opacity: 1, x: 0}} transition={{delay: 0.1}} className={`rounded-3xl p-4 md:p-6 shadow-xl border ${darkMode ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-200'}`}>
+              <h3 className={`font-bold mb-4 md:mb-6 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                <Sparkles className="text-indigo-500 w-5 h-5" /> AI Insights
               </h3>
-              <div className="space-y-4">
-                {mockUserProgress.weakLinks.slice(0, 3).map((id, i) => (
-                  <div key={i} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 group cursor-pointer hover:border-indigo-200">
-                    <p className="text-xs font-bold text-slate-700 mb-1 group-hover:text-indigo-600">Review Item {id}</p>
-                    <p className="text-[10px] text-slate-400 italic leading-tight">Focus on precision and rhythm.</p>
-                  </div>
-                ))}
+              <div className="space-y-2 md:space-y-3 text-xs md:text-sm">
+                <div className={`p-2 md:p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
+                  <p className={`font-bold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Long vowels (Madh)</p>
+                  <p className={`text-[8px] md:text-[10px] ${darkMode ? 'text-slate-500' : 'text-slate-500'}`}>6 more sights to unlock badge</p>
+                </div>
+                <div className={`p-2 md:p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
+                  <p className={`font-bold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Emphasis note consistency</p>
+                  <p className={`text-[8px] md:text-[10px] ${darkMode ? 'text-slate-500' : 'text-slate-500'}`}>Towered voice consistency</p>
+                </div>
+                <div className={`p-2 md:p-3 rounded-lg border ${darkMode ? 'bg-green-900/20 border-green-700' : 'bg-green-50 border-green-200'}`}>
+                  <p className={`font-bold flex items-center gap-1 ${darkMode ? 'text-green-300' : 'text-green-700'}`}>
+                    <CheckCircle2 className="w-4 h-4" /> Safe learning in Surah badge
+                  </p>
+                  <p className={`text-[8px] md:text-[10px] ${darkMode ? 'text-green-400/70' : 'text-green-600'}`}>3 more sights unlocked</p>
+                </div>
               </div>
-              <Button className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-6 rounded-2xl shadow-lg shadow-indigo-100">
-                Start AI Drill
-              </Button>
-            </div>
+            </motion.div>
+
+            {/* Progress Trend */}
+            <motion.div initial={{opacity: 0, x: 20}} animate={{opacity: 1, x: 0}} transition={{delay: 0.2}} className={`rounded-3xl p-4 md:p-6 shadow-xl border ${darkMode ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-200'}`}>
+              <h3 className={`font-bold mb-4 md:mb-6 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Progress Trend</h3>
+              <div className="space-y-3">
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className={`text-xs md:text-sm font-bold ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>This Week</span>
+                    <span className="text-emerald-500 font-bold text-xs md:text-sm">+37%</span>
+                  </div>
+                  <div className={`h-2 rounded-full ${darkMode ? 'bg-slate-700' : 'bg-slate-200'}`}>
+                    <div className="bg-gradient-to-r from-emerald-400 to-green-500 h-2 rounded-full w-[37%]"></div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>

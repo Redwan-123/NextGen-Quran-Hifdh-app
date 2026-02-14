@@ -77,14 +77,14 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-2 md:gap-3"
           >
-            <div className="relative w-7 h-7 md:w-10 md:h-10">
+            <div className="relative w-10 h-10 flex-shrink-0">
               {/* Central Globe */}
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
                 className="absolute inset-0"
               >
-                <Globe className="w-7 h-7 md:w-10 md:h-10 text-white" />
+                <Globe className="w-10 h-10 text-white" />
               </motion.div>
               
               {/* Orbiting planets */}
@@ -93,12 +93,14 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                 transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
                 className="absolute inset-0"
               >
-                <div className="absolute top-0 left-1/2 w-1.5 h-1.5 md:w-2 md:h-2 bg-white/60 rounded-full"></div>
+                <div className="absolute top-0 left-1/2 w-2 h-2 bg-white/60 rounded-full"></div>
               </motion.div>
             </div>
-            <span className="text-lg md:text-2xl font-bold text-white">
-              QuranVerse
-            </span>
+            <div className="flex flex-col items-start">
+              <span className="text-xl md:text-2xl font-bold text-white leading-tight">
+                QuranVerse
+              </span>
+            </div>
           </motion.div>
         </nav>
 
