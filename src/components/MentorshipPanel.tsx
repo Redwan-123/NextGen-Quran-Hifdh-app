@@ -108,17 +108,17 @@ export function MentorshipPanel({ darkMode = false }: MentorshipPanelProps) {
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50'}`}>
-      <div className="max-w-7xl mx-auto px-6 pb-8">
+      <div className="max-w-6xl mx-auto p-3 md:p-6 pb-4 md:pb-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl mb-2 bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
+          <h1 className="text-xl md:text-4xl mb-2 bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent font-bold">
             Mentorship & Guidance
           </h1>
-          <p className="text-slate-600">Connect with scholars for personalized Qur'an learning</p>
+          <p className="text-xs md:text-base text-slate-600">Connect with scholars for personalized Qur'an learning</p>
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-6">

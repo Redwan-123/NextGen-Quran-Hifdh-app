@@ -51,10 +51,10 @@ export function Settings({ darkMode, onDarkModeToggle }: SettingsProps) {
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-slate-50'}`}>
-      <div className="max-w-4xl mx-auto px-6 pb-12">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-          <h1 className={`text-4xl font-bold mb-2 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Settings</h1>
-          <p className={`transition-colors duration-300 ${darkMode ? 'text-slate-300' : 'text-slate-500'}`}>Manage your preferences and bookmarks</p>
+      <div className="max-w-4xl mx-auto px-3 md:px-6 pb-8 md:pb-12">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 md:mb-10">
+          <h1 className={`text-xl md:text-4xl font-bold mb-2 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Settings</h1>
+          <p className={`text-xs md:text-base transition-colors duration-300 ${darkMode ? 'text-slate-300' : 'text-slate-500'}`}>Manage your preferences and bookmarks</p>
         </motion.div>
 
         <div className="space-y-6">

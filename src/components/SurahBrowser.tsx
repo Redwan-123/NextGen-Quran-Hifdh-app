@@ -305,8 +305,8 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
       {!readingSurah && (
         <div className="max-w-7xl mx-auto px-4 md:px-6 pb-16">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 pt-8">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold !text-white mb-2">Browse the Qur'an</h1>
-          <p className="!text-base md:text-lg !text-purple-200">Explore and read the Holy Quran</p>
+          <h1 className="text-xl md:text-5xl lg:text-6xl font-bold !text-white mb-2">Browse the Qur'an</h1>
+          <p className="text-xs md:text-lg !text-purple-200">Explore and read the Holy Quran</p>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="space-y-4 mb-8">

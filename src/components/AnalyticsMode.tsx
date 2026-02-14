@@ -39,7 +39,7 @@ export function AnalyticsMode({ darkMode = false }: AnalyticsModeProps) {
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gradient-to-br from-[#0f051a] via-[#1a0b2e] to-[#0f051a]' : 'bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50'}`}>
-      <div className="max-w-7xl mx-auto px-6 pb-8">
+      <div className="max-w-6xl mx-auto p-3 md:p-6 pb-4 md:pb-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -47,14 +47,14 @@ export function AnalyticsMode({ darkMode = false }: AnalyticsModeProps) {
           className="flex items-center justify-between mb-8"
         >
           <div>
-            <h1 className={`text-4xl mb-2 ${
+            <h1 className={`text-xl md:text-4xl font-bold mb-2 ${
               darkMode 
                 ? 'bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent'
                 : 'bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent'
             }`}>
               Qur'an Witness Mode
             </h1>
-            <p className={darkMode ? 'text-slate-400' : 'text-slate-600'}>
+            <p className={`text-xs md:text-base ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
               Deep insights into your spiritual journey
             </p>
           </div>

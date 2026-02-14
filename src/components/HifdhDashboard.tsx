@@ -99,10 +99,10 @@ export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
       <div className={`max-w-7xl mx-auto px-3 md:px-6 pb-8 pt-4`}>
         
         {/* Header with Title and Button */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 md:mb-6 gap-3">
           <div>
-            <h1 className={`text-3xl md:text-4xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>Smart Hifdh Practice</h1>
-            <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>AI-Powered Smart Trial Repository Analysis</p>
+            <h1 className={`text-xl md:text-4xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>Smart Hifdh Practice</h1>
+            <p className={`text-xs md:text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>AI-Powered Smart Trial Repository Analysis</p>
           </div>
           <Button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 h-10 rounded-xl font-bold text-sm">
             Finish Session
@@ -110,26 +110,26 @@ export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
-          <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-4 md:p-6 text-white shadow-lg">
-            <Flame className="w-6 h-6 md:w-8 md:h-8 mb-2" />
-            <span className="text-2xl md:text-3xl font-bold block">7</span>
-            <p className="text-xs md:text-sm opacity-90 font-medium">Day Streak</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-6">
+          <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-3 md:p-6 text-white shadow-lg">
+            <Flame className="w-5 h-5 md:w-8 md:h-8 mb-1 md:mb-2" />
+            <span className="text-lg md:text-3xl font-bold block">7</span>
+            <p className="text-[10px] md:text-sm opacity-90 font-medium">Day Streak</p>
           </motion.div>
-          <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} transition={{delay: 0.1}} className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-4 md:p-6 text-white shadow-lg">
-            <Target className="w-6 h-6 md:w-8 md:h-8 mb-2" />
-            <span className="text-2xl md:text-3xl font-bold block">3</span>
-            <p className="text-xs md:text-sm opacity-90 font-medium">Ayahs Memorized</p>
+          <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} transition={{delay: 0.1}} className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-3 md:p-6 text-white shadow-lg">
+            <Target className="w-5 h-5 md:w-8 md:h-8 mb-1 md:mb-2" />
+            <span className="text-lg md:text-3xl font-bold block">3</span>
+            <p className="text-[10px] md:text-sm opacity-90 font-medium">Ayahs Memorized</p>
           </motion.div>
-          <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} transition={{delay: 0.2}} className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-4 md:p-6 text-white shadow-lg">
-            <TrendingUp className="w-6 h-6 md:w-8 md:h-8 mb-2" />
-            <span className="text-2xl md:text-3xl font-bold block">50%</span>
-            <p className="text-xs md:text-sm opacity-90 font-medium">Overall Mastery</p>
+          <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} transition={{delay: 0.2}} className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-3 md:p-6 text-white shadow-lg">
+            <TrendingUp className="w-5 h-5 md:w-8 md:h-8 mb-1 md:mb-2" />
+            <span className="text-lg md:text-3xl font-bold block">50%</span>
+            <p className="text-[10px] md:text-sm opacity-90 font-medium">Overall Mastery</p>
           </motion.div>
-          <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} transition={{delay: 0.3}} className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-4 md:p-6 text-white shadow-lg">
-            <Brain className="w-6 h-6 md:w-8 md:h-8 mb-2" />
-            <span className="text-2xl md:text-3xl font-bold block">2</span>
-            <p className="text-xs md:text-sm opacity-90 font-medium">Weak Links</p>
+          <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0}} transition={{delay: 0.3}} className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-3 md:p-6 text-white shadow-lg">
+            <Brain className="w-5 h-5 md:w-8 md:h-8 mb-1 md:mb-2" />
+            <span className="text-lg md:text-3xl font-bold block">2</span>
+            <p className="text-[10px] md:text-sm opacity-90 font-medium">Weak Links</p>
           </motion.div>
         </div>
 

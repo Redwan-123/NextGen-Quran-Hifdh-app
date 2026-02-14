@@ -9,14 +9,12 @@ import { AnalyticsMode } from './components/AnalyticsMode';
 import { SurahBrowser } from './components/SurahBrowser';
 import { FeatureShowcase } from './components/FeatureShowcase';
 import { Settings } from './components/Settings';
-import { Menu, X } from 'lucide-react';
 
 type Screen = 'landing' | 'home' | 'ayah' | 'hifdh' | 'mentorship' | 'analytics' | 'surah-browser' | 'feature-showcase' | 'settings';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
-  const [showMenu, setShowMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('quran_dark_mode');
@@ -75,7 +73,6 @@ export default function App() {
                 key={item.id}
                 onClick={() => {
                   setCurrentScreen(item.id);
-                  setShowMenu(false);
                 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -106,48 +103,17 @@ export default function App() {
       {/* Spacer to push content below fixed nav */}
       {currentScreen !== 'landing' && <div className="h-32 md:h-36 lg:h-40"></div>}
 
-      {/* Mobile Menu Toggle */}
-      <motion.button
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        onClick={() => setShowMenu(!showMenu)}
-        className={`md:hidden fixed top-6 right-6 z-50 w-12 h-12 rounded-full shadow-lg flex items-center justify-center border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}
-      >
-        {showMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </motion.button>
-
-      {/* Mobile Menu Content */}
-      <AnimatePresence>
-        {showMenu && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={`md:hidden fixed top-20 right-6 z-40 rounded-2xl shadow-2xl border p-4 min-w-[200px] ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}
-          >
-            {navigationItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setCurrentScreen(item.id);
-                    setShowMenu(false);
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                    currentScreen === item.id
-                      ? 'bg-gradient-to-r from-purple-500 to-violet-500 text-white'
-                      : 'text-slate-600 hover:bg-slate-100'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
-                </button>
-              );
-            })}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Settings Icon - Mobile */}
+      {currentScreen !== 'landing' && (
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={() => setCurrentScreen('settings')}
+          className={`md:hidden fixed top-6 right-6 z-50 w-12 h-12 rounded-full shadow-lg flex items-center justify-center border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}
+        >
+          <span className="text-xl">⚙️</span>
+        </motion.button>
+      )}
 
       {/* Screen Transitions */}
       <AnimatePresence mode="wait">
