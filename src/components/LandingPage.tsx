@@ -71,20 +71,20 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
 
       <div className="relative z-10">
         {/* Header/Navigation */}
-        <nav className="flex items-center justify-between px-6 py-6 max-w-7xl mx-auto">
+        <nav className="flex items-center justify-between px-3 md:px-6 py-3 md:py-6 max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3"
+            className="flex items-center gap-2 md:gap-3"
           >
-            <div className="relative w-10 h-10">
+            <div className="relative w-7 h-7 md:w-10 md:h-10">
               {/* Central Globe */}
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
                 className="absolute inset-0"
               >
-                <Globe className="w-10 h-10 text-white" />
+                <Globe className="w-7 h-7 md:w-10 md:h-10 text-white" />
               </motion.div>
               
               {/* Orbiting planets */}
@@ -93,43 +93,43 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                 transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
                 className="absolute inset-0"
               >
-                <div className="absolute top-0 left-1/2 w-2 h-2 bg-white/60 rounded-full"></div>
+                <div className="absolute top-0 left-1/2 w-1.5 h-1.5 md:w-2 md:h-2 bg-white/60 rounded-full"></div>
               </motion.div>
             </div>
-            <span className="text-2xl font-bold text-white">
+            <span className="text-lg md:text-2xl font-bold text-white">
               QuranVerse
             </span>
           </motion.div>
         </nav>
 
         {/* Hero Section */}
-        <div className="max-w-7xl mx-auto px-6 py-20 text-center">
+        <div className="max-w-7xl mx-auto px-3 md:px-6 py-8 md:py-20 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="mb-12"
+            className="mb-6 md:mb-12"
           >
             <motion.div
-              className="inline-block mb-6"
+              className="inline-block mb-3 md:mb-6"
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              <Sparkles className="w-12 h-12 text-white" />
+              <Sparkles className="w-8 h-8 md:w-12 md:h-12 text-white" />
             </motion.div>
-            <h1 className="text-6xl md:text-7xl font-bold mb-6 text-white">
+            <h1 className="text-3xl md:text-6xl lg:text-7xl font-bold mb-3 md:mb-6 text-white">
               Your Spiritual Journey Begins Here
             </h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto mb-8">
+            <p className="text-sm md:text-xl text-white/90 max-w-2xl mx-auto mb-4 md:mb-8 px-2">
               Connect with the Quran on an emotional level. Find verses that speak to your heart, learn from world-class scholars, and grow in faith.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onGetStarted}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-purple-600 font-bold shadow-lg hover:shadow-xl transition-shadow uppercase tracking-wide"
+              className="inline-flex items-center gap-2 px-4 md:px-8 py-2 md:py-4 rounded-full bg-white text-purple-600 font-bold shadow-lg hover:shadow-xl transition-shadow uppercase tracking-wide text-xs md:text-base"
             >
-              LAUNCH APP <ArrowRight className="w-5 h-5" />
+              LAUNCH APP <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
             </motion.button>
           </motion.div>
 
@@ -138,36 +138,36 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 py-12 border-y border-white/20"
+            className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 py-6 md:py-12 border-y border-white/20"
           >
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-white">
+                <p className="text-xl md:text-3xl lg:text-4xl font-bold text-white">
                   {stat.number}
                 </p>
-                <p className="text-sm text-white/80 mt-2">{stat.label}</p>
+                <p className="text-xs md:text-sm text-white/80 mt-1 md:mt-2">{stat.label}</p>
               </div>
             ))}
           </motion.div>
         </div>
 
         {/* Features Section */}
-        <div className="max-w-7xl mx-auto px-6 py-20">
+        <div className="max-w-7xl mx-auto px-3 md:px-6 py-8 md:py-20">
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-8 md:mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-4 text-white">
               Powerful Features for Your Growth
             </h2>
-            <p className="text-white/80 max-w-2xl mx-auto">
+            <p className="text-white/80 max-w-2xl mx-auto text-sm md:text-base px-2">
               Everything you need to deepen your relationship with the Quran
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8">
             {features.map((feature, index) => {
               const IconComponent = feature.icon;
               return (
@@ -177,13 +177,13 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="group p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:border-white/40 shadow-lg hover:shadow-xl transition-all"
+                  className="group p-4 md:p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:border-white/40 shadow-lg hover:shadow-xl transition-all"
                 >
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} p-2.5 mb-4 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-r ${feature.color} p-2 md:p-2.5 mb-3 md:mb-4 group-hover:scale-110 transition-transform`}>
                     <IconComponent className="w-full h-full text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                  <p className="text-white/80">{feature.description}</p>
+                  <h3 className="text-base md:text-xl font-bold text-white mb-2 md:mb-3">{feature.title}</h3>
+                  <p className="text-white/80 text-sm md:text-base">{feature.description}</p>
                 </motion.div>
               );
             })}
@@ -195,28 +195,28 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="max-w-4xl mx-auto px-6 py-20 text-center"
+          className="max-w-4xl mx-auto px-3 md:px-6 py-8 md:py-20 text-center"
         >
-          <div className="bg-white/10 rounded-3xl border border-white/20 p-12 backdrop-blur-xl">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">
+          <div className="bg-white/10 rounded-3xl border border-white/20 p-6 md:p-12 backdrop-blur-xl">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-6 text-white">
               Ready to Transform Your Quranic Journey?
             </h2>
-            <p className="text-white/80 mb-8 max-w-2xl mx-auto">
+            <p className="text-white/80 mb-4 md:mb-8 max-w-2xl mx-auto text-sm md:text-base px-2">
               Join thousands of students who are deepening their understanding of the Quran with personalized guidance and AI-powered insights.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onGetStarted}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-purple-600 font-bold shadow-lg hover:shadow-xl transition-shadow uppercase tracking-wide"
+              className="inline-flex items-center gap-2 px-4 md:px-8 py-2 md:py-4 rounded-full bg-white text-purple-600 font-bold shadow-lg hover:shadow-xl transition-shadow uppercase tracking-wide text-xs md:text-base"
             >
-              START YOUR JOURNEY <ArrowRight className="w-5 h-5" />
+              START YOUR JOURNEY <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
             </motion.button>
           </div>
         </motion.div>
 
         {/* Footer */}
-        <div className="border-t border-white/20 py-8 text-center text-white/80">
+        <div className="border-t border-white/20 py-4 md:py-8 text-center text-white/80 text-xs md:text-base">
           <p>© 2026 QuranVerse. Helping you connect with the Quran on a deeper level.</p>
         </div>
       </div>

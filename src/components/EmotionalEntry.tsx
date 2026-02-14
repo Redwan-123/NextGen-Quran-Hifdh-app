@@ -49,13 +49,13 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
         ))}
       </div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-3 md:p-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12"
+          className="text-center mb-6 md:mb-12"
         >
           <motion.div
             animate={{ 
@@ -67,22 +67,22 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="inline-block mb-4"
+            className="inline-block mb-2 md:mb-4"
           >
-            <Heart className="w-16 h-16 text-purple-400 fill-purple-200" />
+            <Heart className="w-12 h-12 md:w-16 md:h-16 text-purple-400 fill-purple-200" />
           </motion.div>
           
-          <h1 className={`text-4xl mb-3 bg-gradient-to-r ${darkMode ? 'from-purple-300 to-violet-300' : 'from-purple-600 to-violet-600'} bg-clip-text text-transparent`}>
+          <h1 className={`text-2xl md:text-4xl mb-2 md:mb-3 bg-gradient-to-r ${darkMode ? 'from-purple-300 to-violet-300' : 'from-purple-600 to-violet-600'} bg-clip-text text-transparent`}>
             How are you feeling?
           </h1>
-          <p className={`text-lg max-w-md mx-auto ${darkMode ? 'text-purple-200' : 'text-slate-500'}`}>
+          <p className={`text-xs md:text-lg max-w-md mx-auto ${darkMode ? 'text-purple-200' : 'text-slate-500'} px-2`}>
             Let the Qur'an speak to your heart. Select an emotion or describe how you feel.
           </p>
         </motion.div>
 
         {/* Emotion Grid */}
         <motion.div 
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 max-w-4xl w-full"
+          className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-8 max-w-4xl w-full"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -111,7 +111,7 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
               )}
 
               {/* Card */}
-              <div className={`relative rounded-3xl p-6 border-2 transition-all duration-300 ${
+              <div className={`relative rounded-3xl p-3 md:p-6 border-2 transition-all duration-300 ${
                 darkMode
                   ? `bg-purple-900/20 backdrop-blur-xl border-purple-500/40 ${
                       selectedEmotion === emotion.id 
@@ -146,8 +146,8 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
                 )}
 
                 <div className="relative">
-                  <div className="text-5xl mb-3">{emotion.icon}</div>
-                  <h3 className="font-medium text-slate-700">{emotion.label}</h3>
+                  <div className="text-3xl md:text-5xl mb-1 md:mb-3">{emotion.icon}</div>
+                  <h3 className="font-medium text-slate-700 text-xs md:text-base">{emotion.label}</h3>
                 </div>
 
                 {/* Ripple effect on selection */}
@@ -169,17 +169,17 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="w-full max-w-md"
+          className="w-full max-w-md px-2 md:px-0"
         >
           <div className="relative">
             <input
               type="text"
               value={customEmotion}
               onChange={(e) => setCustomEmotion(e.target.value)}
-              placeholder="Or describe your feeling in your own words..."
-              className="w-full px-6 py-4 bg-white/70 backdrop-blur-xl rounded-2xl border-2 border-white/50 
+              placeholder="Or describe your feeling..."
+              className="w-full px-3 md:px-6 py-2 md:py-4 bg-white/70 backdrop-blur-xl rounded-2xl border-2 border-white/50 
                 focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-200/50 
-                text-slate-700 placeholder:text-slate-400 shadow-lg transition-all"
+                text-slate-700 placeholder:text-slate-400 shadow-lg transition-all text-xs md:text-base"
               onKeyPress={(e) => {
                 if (e.key === 'Enter' && customEmotion.trim()) {
                   setSelectedEmotion('custom');
@@ -189,13 +189,13 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
                 }
               }}
             />
-            <Sparkles className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-400" />
+            <Sparkles className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-purple-400" />
           </div>
         </motion.div>
 
         {/* Subtle bottom decoration */}
         <motion.div
-          className="mt-16 text-center text-slate-400 text-sm"
+          className="mt-8 md:mt-16 text-center text-slate-400 text-xs md:text-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
