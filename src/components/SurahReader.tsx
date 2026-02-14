@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Bookmark, Pause, Play, Share2, SkipBack, SkipForward, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface Verse {
   id?: number | string;
@@ -87,26 +87,10 @@ export function SurahReader({
   onToggleBookmark,
   isLoadingVerses = false,
 }: SurahReaderProps) {
-  const [localBookmarks, setLocalBookmarks] = useState<Set<number>>(new Set());
-  const [localPlayState, setLocalPlayState] = useState(false);
-  const [showReciterMenu, setShowReciterMenu] = useState(false);
   const [expandedTranslations, setExpandedTranslations] = useState<Set<number>>(new Set());
-  const [expandedTafsir, setExpandedTafsir] = useState<Set<number>>(new Set());
 
   const toggleTranslation = (index: number) => {
     setExpandedTranslations((prev) => {
-      const next = new Set(prev);
-      if (next.has(index)) {
-        next.delete(index);
-      } else {
-        next.add(index);
-      }
-      return next;
-    });
-  };
-
-  const toggleTafsir = (index: number) => {
-    setExpandedTafsir((prev) => {
       const next = new Set(prev);
       if (next.has(index)) {
         next.delete(index);
@@ -144,107 +128,23 @@ export function SurahReader({
     return Math.min(Math.max(currentAyahIndex, 0), versesToRender.length - 1);
   }, [versesToRender, currentAyahIndex]);
 
-  const isBookmarked = (index: number) => {
-    if (shouldRenderPlaceholders) return false;
-    const verseNumber = index + 1;
-    if (bookmarkedAyahs.length && surahNumber) {
-      return bookmarkedAyahs.some((b) => b.surah === surahNumber && b.ayah === verseNumber);
-    }
-    return localBookmarks.has(verseNumber);
-  };
-
-  const handleBookmarkToggle = (index: number) => {
-    if (shouldRenderPlaceholders) return;
-    const verseNumber = index + 1;
-
-    if (!bookmarkedAyahs.length || !surahNumber) {
-      setLocalBookmarks((prev) => {
-        const next = new Set(prev);
-        if (next.has(verseNumber)) {
-          next.delete(verseNumber);
-        } else {
-          next.add(verseNumber);
-        }
-        return next;
-      });
-    }
-
-    onToggleBookmark?.(index);
-  };
-
   const handleVerseSelect = (index: number) => {
     onAyahSelect?.(index);
   };
 
-  const handleVersePlay = (index: number) => {
-    onAyahSelect?.(index);
-    if (onAudioPlay) {
-      onAudioPlay(index);
-    } else {
-      setLocalPlayState(true);
-    }
-  };
-
-  const playState = isPlaying ?? localPlayState;
-
-  const handleTogglePlay = () => {
-    if (onTogglePlayPause) {
-      onTogglePlayPause();
-    } else {
-      setLocalPlayState((prev) => !prev);
-    }
-  };
-
-  const handleNext = () => {
-    if (onPlayNext) onPlayNext();
-  };
-
-  const handlePrevious = () => {
-    if (onPlayPrevious) onPlayPrevious();
-  };
-
-  const handleShareVerse = useCallback(
-    async (index: number) => {
-      if (shouldRenderPlaceholders) return;
-      const verse = versesToRender[index];
-      if (!verse) return;
-
-      const arabicText = getAyahText(verse);
-      const translationText = getAyahTranslation(verse);
-      const payload = `${surahName} • Ayah ${index + 1}\n${arabicText}\n${translationText}`.trim();
-
-      try {
-        if (typeof navigator !== 'undefined' && navigator.share) {
-          await navigator.share({ title: `${surahName} – Ayah ${index + 1}`, text: payload });
-          return;
-        }
-        if (typeof navigator !== 'undefined' && navigator.clipboard) {
-          await navigator.clipboard.writeText(payload);
-        }
-      } catch (error) {
-        console.warn('Unable to share ayah', error);
-      }
-    },
-    [shouldRenderPlaceholders, versesToRender, surahName]
-  );
-
   const showBismillah = surahNumber !== 9;
   const verseCountDisplay = verses && verses.length ? `${verses.length} Ayahs` : 'Loading…';
-  const controlButtonBase =
-    'flex items-center justify-center rounded-full bg-white/15 text-white transition-all duration-200 hover:bg-white/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-50 disabled:cursor-not-allowed';
+  const cardBaseClasses =
+    'group relative rounded-3xl border border-white/12 bg-white/4 backdrop-blur-xl px-8 py-10 sm:px-12 sm:py-12 shadow-[0_20px_70px_rgba(8,0,38,0.55)] transition-all duration-300';
   const backgroundGradient = 'linear-gradient(160deg, #5f0bbf 0%, #3a0d5c 55%, #19062d 100%)';
   const glowOverlay =
     'radial-gradient(circle at 15% 20%, rgba(255,255,255,0.2), transparent 50%), radial-gradient(circle at 80% 0%, rgba(255,255,255,0.12), transparent 40%)';
-  const iconButtonBase =
-    'flex h-11 w-11 items-center justify-center rounded-full border border-white/18 bg-white/5 text-white/80 transition-colors duration-200 hover:bg-white/15';
-  const cardBaseClasses =
-    'group relative rounded-3xl border border-white/12 bg-white/4 backdrop-blur-xl px-8 py-10 sm:px-12 sm:py-12 shadow-[0_20px_70px_rgba(8,0,38,0.55)] transition-all duration-300';
 
   return createPortal(
-    <div className="fixed inset-0 z-[100000] flex flex-col text-white" style={{ backgroundImage: backgroundGradient }}>
+    <div className="surah-reader-modal fixed inset-0 z-[100000] flex flex-col text-white" style={{ backgroundImage: backgroundGradient }}>
       <div className="pointer-events-none absolute inset-0 opacity-70" style={{ backgroundImage: glowOverlay }} />
       <div className="relative z-[1] flex h-full flex-col">
-        <header className="flex flex-col gap-4 px-5 py-6 border-b border-white/10 sm:flex-row sm:items-center sm:gap-8 sm:px-10">
+        <header className="surah-reader-header flex flex-col gap-4 px-5 py-6 border-b border-white/10 sm:flex-row sm:items-center sm:gap-8 sm:px-10">
           <div className="flex items-center gap-4">
             <button
               onClick={onClose}
@@ -255,24 +155,24 @@ export function SurahReader({
             </button>
             <div className="space-y-1 text-left">
               <p className="reader-sans text-[0.65rem] uppercase tracking-[0.45em] text-white/60">{surahType}</p>
-              <p className="reader-sans text-xl font-semibold text-white leading-tight">{surahName}</p>
-              <p className="font-arabic text-2xl text-white leading-tight">{surahNameArabic}</p>
+              <p className="surah-reader-title reader-sans font-semibold text-white leading-tight">{surahName}</p>
+              <p className="surah-reader-title-arabic font-arabic text-white leading-tight">{surahNameArabic}</p>
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 py-12 pb-16 sm:px-10 sm:py-16 sm:pb-20">
+        <main className="surah-reader-main flex-1 overflow-y-auto px-4 py-12 pb-16 sm:px-10 sm:py-16 sm:pb-20">
           <div className="mx-auto w-full max-w-5xl">
-            <section className="text-center space-y-6 mb-16">
+            <section className="surah-reader-hero text-center space-y-6 mb-16">
               <p className="reader-sans text-[0.7rem] uppercase tracking-[0.6em] text-white/50">{surahType} • {verseCountDisplay}</p>
-              <p className="reader-display text-5xl sm:text-7xl md:text-8xl text-white leading-tight">{surahName}</p>
-              <p className="font-arabic text-5xl sm:text-6xl md:text-7xl text-white leading-relaxed">{surahNameArabic}</p>
-              <p className="reader-sans text-xl sm:text-2xl text-white/60 mt-8">{surahTranslation || 'Reflect on every ayah with clarity.'}</p>
+              <p className="surah-reader-hero-title reader-display text-white leading-tight">{surahName}</p>
+              <p className="surah-reader-hero-subtitle font-arabic text-white leading-relaxed">{surahNameArabic}</p>
+              <p className="surah-reader-hero-description reader-sans text-white/60 mt-8">{surahTranslation || 'Reflect on every ayah with clarity.'}</p>
             </section>
 
             {showBismillah && (
               <div className="mt-16 mb-16 flex justify-center">
-                <div className="inline-flex items-center rounded-2xl border border-white/20 bg-white/8 px-12 py-6 text-3xl sm:text-4xl font-arabic shadow-[0_20px_70px_rgba(12,0,45,0.55)]">
+                <div className="surah-reader-bismillah inline-flex items-center rounded-2xl border border-white/20 bg-white/8 px-12 py-6 font-arabic shadow-[0_20px_70px_rgba(12,0,45,0.55)]">
                   بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
                 </div>
               </div>
@@ -290,93 +190,43 @@ export function SurahReader({
                   : getAyahTranslation(verse) || 'Translation coming soon.';
                 const ayahArabic = shouldRenderPlaceholders ? '...' : getAyahText(verse);
                 const isActive = index === safeActiveIndex;
-                const bookmarked = isBookmarked(index) || Boolean(verse?.bookmarked);
                 const cardElevation = isActive ? 'border-purple-400/50 bg-[#5313a0]/20 scale-[1.01]' : 'hover:border-white/20';
 
                 return (
                   <div
                     key={`${verse?.verse_key || verse?.id || index}`}
-                    className={`${cardBaseClasses} ${cardElevation}`}
+                    className={`surah-reader-verse-card ${cardBaseClasses} ${cardElevation}`}
                     onClick={() => handleVerseSelect(index)}
                   >
-                    <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                    <div className="surah-reader-verse-content flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                       <div className="flex flex-1 items-start gap-5">
                         <div className="relative pt-1">
                           <div
-                            className={`flex h-12 w-12 items-center justify-center rounded-full text-base font-semibold shadow-lg sm:h-14 sm:w-14 ${
+                            className={`surah-reader-verse-number flex h-12 w-12 items-center justify-center rounded-full text-base font-semibold shadow-lg sm:h-14 sm:w-14 ${
                               isActive ? 'bg-[#5313a0] text-white' : 'bg-white/15 text-white'
-                            } ${bookmarked ? 'ring-2 ring-yellow-200/70' : ''}`}
+                            }`}
                           >
                             {verseNumber}
                           </div>
                           <span className="pointer-events-none absolute left-1/2 top-full hidden h-11 w-px -translate-x-1/2 translate-y-2 bg-white/25 md:block" />
                         </div>
-                        <div className="space-y-5">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleTranslation(index);
-                              }}
-                              className="reader-sans text-[0.6rem] uppercase tracking-[0.35em] font-semibold px-4 py-2 rounded-full border border-white/25 bg-white/6 text-white/70 transition-all hover:border-white/50 hover:bg-white/12 hover:text-white/90"
-                            >
-                              {expandedTranslations.has(index) ? '✓ Translation' : 'See Translation'}
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleTafsir(index);
-                              }}
-                              className="reader-sans text-[0.6rem] uppercase tracking-[0.35em] font-semibold px-4 py-2 rounded-full border border-white/25 bg-white/6 text-white/70 transition-all hover:border-white/50 hover:bg-white/12 hover:text-white/90"
-                            >
-                              {expandedTafsir.has(index) ? '✓ Tafsir' : 'See Tafsir'}
-                            </button>
-                          </div>
+                        <div className="surah-reader-verse-details space-y-3">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleTranslation(index);
+                            }}
+                            className="surah-reader-action-btn reader-sans uppercase tracking-[0.35em] font-semibold px-4 py-2 rounded-full border border-white/25 bg-white/6 text-white/70 transition-all hover:border-white/50 hover:bg-white/12 hover:text-white/90"
+                          >
+                            {expandedTranslations.has(index) ? '✓ Translation' : 'See Translation'}
+                          </button>
                           {expandedTranslations.has(index) && (
-                            <p className="reader-sans text-lg leading-relaxed text-white/85 sm:text-xl mt-5 pt-5 border-t border-white/10">{translation}</p>
+                            <p className="surah-reader-expansion-text reader-sans text-lg leading-relaxed text-white/85 sm:text-xl mt-5 pt-5 border-t border-white/10">{translation}</p>
                           )}
-                          {expandedTafsir.has(index) && (
-                            <p className="reader-sans text-base leading-relaxed text-white/75 mt-5 pt-5 border-t border-white/10 italic">Tafsir (Ibn Kathir): [Detailed explanation would load here based on ayah data]</p>
-                          )}
-                          <div className="flex items-center gap-3 mt-6 pt-4 border-t border-white/10">
-                            <button
-                              aria-label="Play ayah audio"
-                              className={iconButtonBase}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                handleVersePlay(index);
-                              }}
-                              disabled={shouldRenderPlaceholders}
-                            >
-                              <Play className="h-4 w-4" />
-                            </button>
-                            <button
-                              aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark ayah'}
-                              className={`${iconButtonBase} ${bookmarked ? 'text-yellow-200 border-yellow-200/60' : ''}`}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                handleBookmarkToggle(index);
-                              }}
-                              disabled={shouldRenderPlaceholders}
-                            >
-                              <Bookmark className="h-4 w-4" />
-                            </button>
-                            <button
-                              aria-label="Share ayah"
-                              className={iconButtonBase}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                handleShareVerse(index);
-                              }}
-                              disabled={shouldRenderPlaceholders}
-                            >
-                              <Share2 className="h-4 w-4" />
-                            </button>
-                          </div>
                         </div>
                       </div>
 
-                      <p className="font-arabic text-4xl leading-[2.2] text-white sm:text-5xl md:text-6xl md:max-w-[50%] text-right">
+                      <p className="surah-reader-verse-arabic font-arabic text-4xl leading-[2.2] text-white sm:text-5xl md:text-6xl md:max-w-[50%] text-right">
                         {ayahArabic}
                       </p>
                     </div>
@@ -386,8 +236,6 @@ export function SurahReader({
             </section>
           </div>
         </main>
-
-
       </div>
     </div>,
     document.body

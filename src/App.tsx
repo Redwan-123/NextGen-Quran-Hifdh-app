@@ -9,7 +9,7 @@ import { AnalyticsMode } from './components/AnalyticsMode';
 import { SurahBrowser } from './components/SurahBrowser';
 import { FeatureShowcase } from './components/FeatureShowcase';
 import { Settings } from './components/Settings';
-import { Home, BookOpen, Brain, Users, BarChart3, Menu, X, Book, Settings as SettingsIcon } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 type Screen = 'landing' | 'home' | 'ayah' | 'hifdh' | 'mentorship' | 'analytics' | 'surah-browser' | 'feature-showcase' | 'settings';
 
@@ -47,13 +47,13 @@ export default function App() {
   };
 
   const navigationItems = [
-    { id: 'landing' as Screen, label: 'Start', icon: Home },
+    { id: 'landing' as Screen, label: 'Start', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>🏁</span> },
     { id: 'home' as Screen, label: 'Emotions', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>🤲</span> },
-    { id: 'surah-browser' as Screen, label: 'Browse', icon: Book },
-    { id: 'hifdh' as Screen, label: 'Hifdh', icon: Brain },
-    { id: 'mentorship' as Screen, label: 'Mentors', icon: Users },
-    { id: 'analytics' as Screen, label: 'Insights', icon: BarChart3 },
-    { id: 'settings' as Screen, label: 'Settings', icon: SettingsIcon },
+    { id: 'surah-browser' as Screen, label: 'Browse', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>📚</span> },
+    { id: 'hifdh' as Screen, label: 'Hifdh', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>📋</span> },
+    { id: 'mentorship' as Screen, label: 'Mentors', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>🧑‍💼</span> },
+    { id: 'analytics' as Screen, label: 'Insights', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>📈</span> },
+    { id: 'settings' as Screen, label: 'Settings', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>⚙️</span> },
   ];
 
   return (
