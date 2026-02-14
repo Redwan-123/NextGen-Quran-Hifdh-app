@@ -47,13 +47,13 @@ export default function App() {
   };
 
   const navigationItems = [
-    { id: 'landing' as Screen, label: 'Start', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>🏁</span> },
-    { id: 'home' as Screen, label: 'Emotions', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>🤲</span> },
-    { id: 'surah-browser' as Screen, label: 'Browse', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>📚</span> },
-    { id: 'hifdh' as Screen, label: 'Hifdh', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>📋</span> },
-    { id: 'mentorship' as Screen, label: 'Mentors', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>🧑‍💼</span> },
-    { id: 'analytics' as Screen, label: 'Insights', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>📈</span> },
-    { id: 'settings' as Screen, label: 'Settings', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: '1.2em' }}>⚙️</span> },
+    { id: 'landing' as Screen, label: 'Start', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>🏁</span> },
+    { id: 'home' as Screen, label: 'Emotions', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>🤲</span> },
+    { id: 'surah-browser' as Screen, label: 'Browse', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>📚</span> },
+    { id: 'hifdh' as Screen, label: 'Hifdh', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>📋</span> },
+    { id: 'mentorship' as Screen, label: 'Mentors', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>🧑‍💼</span> },
+    { id: 'analytics' as Screen, label: 'Insights', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>📈</span> },
+    { id: 'settings' as Screen, label: 'Settings', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>⚙️</span> },
   ];
 
   return (
@@ -63,9 +63,9 @@ export default function App() {
       <motion.div
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className="fixed top-6 left-1/2 -translate-x-1/2 z-50"
+        className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-full px-2"
       >
-        <div className="rounded-full border border-white/10 px-2 py-2 flex items-center gap-1 bg-[#4a167a]/90 shadow-[0_25px_70px_rgba(37,3,68,0.55)] backdrop-blur-2xl">
+        <div className="rounded-full border border-white/10 px-1 py-1 flex items-center gap-0.5 bg-[#4a167a]/90 shadow-[0_25px_70px_rgba(37,3,68,0.55)] backdrop-blur-2xl mx-auto w-fit">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentScreen === item.id;
@@ -79,7 +79,7 @@ export default function App() {
                 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`relative px-4 py-2.5 rounded-full transition-all reader-sans text-[0.7rem] font-semibold uppercase tracking-[0.35em] ${
+                className={`relative px-2 md:px-4 py-1.5 md:py-2.5 rounded-full transition-all reader-sans text-[0.6rem] md:text-[0.7rem] font-semibold uppercase tracking-[0.2em] md:tracking-[0.35em] ${
                   isActive 
                     ? 'text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.35)]' 
                     : 'text-purple-100/70 hover:text-white'
@@ -92,8 +92,8 @@ export default function App() {
                     transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                   />
                 )}
-                <div className="relative z-10 flex items-center gap-2">
-                  <Icon className="w-4 h-4" />
+                <div className="relative z-10 flex items-center gap-1 md:gap-2">
+                  <Icon className="w-3 h-3 md:w-4 md:h-4" />
                   <span className="hidden md:inline">{item.label}</span>
                 </div>
               </motion.button>
@@ -104,7 +104,7 @@ export default function App() {
       )}
 
       {/* Spacer to push content below fixed nav */}
-      {currentScreen !== 'landing' && <div className="h-32 md:h-36 lg:h-40"></div>}
+      {currentScreen !== 'landing' && <div className="h-20 md:h-32 lg:h-40"></div>}
 
       {/* Mobile Menu Toggle */}
       <motion.button
