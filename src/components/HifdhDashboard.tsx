@@ -157,7 +157,6 @@ export function HifdhDashboard({ darkMode = false }: HifdhDashboardProps) {
                     </motion.p>
                   </AnimatePresence>
                 )}
-                <p className={`text-xs md:text-sm text-white/40 absolute bottom-4 right-4`}>In the name of Allah, the Most Gracious, the Most Merciful</p>
               </div>
 
               {/* Feedback Metrics */}
