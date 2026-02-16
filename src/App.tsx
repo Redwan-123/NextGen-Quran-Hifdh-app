@@ -103,20 +103,6 @@ export default function App() {
       {/* Spacer to push content below fixed nav */}
       {currentScreen !== 'landing' && <div className="h-32 sm:h-36 md:h-44"></div>}
 
-      {/* Settings Icon - Mobile */}
-      {currentScreen !== 'landing' && (
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          onClick={() => setCurrentScreen('settings')}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="md:hidden fixed top-8 right-6 z-50 text-2xl hover:scale-110 transition-transform"
-        >
-          ⚙️
-        </motion.button>
-      )}
-
       {/* Screen Transitions */}
       <AnimatePresence mode="wait">
         {currentScreen === 'landing' && (
