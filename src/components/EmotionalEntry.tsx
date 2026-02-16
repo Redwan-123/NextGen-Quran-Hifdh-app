@@ -55,7 +55,7 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-6 md:mb-12"
+          className="text-center mb-4 md:mb-8"
         >
           <motion.div
             animate={{ 
@@ -67,22 +67,22 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="inline-block mb-2 md:mb-4"
+            className="inline-block mb-2 md:mb-3"
           >
-            <Heart className="w-12 h-12 md:w-16 md:h-16 text-purple-400 fill-purple-200" />
+            <Heart className="w-8 h-8 md:w-12 md:h-12 text-purple-400 fill-purple-200" />
           </motion.div>
           
-          <h1 className={`text-2xl md:text-4xl mb-2 md:mb-3 bg-gradient-to-r ${darkMode ? 'from-purple-300 to-violet-300' : 'from-purple-600 to-violet-600'} bg-clip-text text-transparent`}>
+          <h1 className={`text-base md:text-2xl mb-1 md:mb-2 bg-gradient-to-r ${darkMode ? 'from-purple-300 to-violet-300' : 'from-purple-600 to-violet-600'} bg-clip-text text-transparent`}>
             How are you feeling?
           </h1>
-          <p className={`text-xs md:text-lg max-w-md mx-auto ${darkMode ? 'text-purple-200' : 'text-slate-500'} px-2`}>
+          <p className={`text-[10px] md:text-sm max-w-md mx-auto ${darkMode ? 'text-purple-200' : 'text-slate-500'} px-2`}>
             Let the Qur'an speak to your heart. Select an emotion or describe how you feel.
           </p>
         </motion.div>
 
         {/* Emotion Grid */}
         <motion.div 
-          className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-8 max-w-4xl w-full"
+          className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-4 md:mb-6 max-w-4xl w-full"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -111,7 +111,7 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
               )}
 
               {/* Card */}
-              <div className={`relative rounded-3xl p-3 md:p-6 border-2 transition-all duration-300 ${
+              <div className={`relative rounded-2xl p-2 md:p-4 border-2 transition-all duration-300 ${
                 darkMode
                   ? `bg-purple-900/20 backdrop-blur-xl border-purple-500/40 ${
                       selectedEmotion === emotion.id 
@@ -126,7 +126,7 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
               }`}>
                 {selectedEmotion === emotion.id && (
                   <motion.div
-                    className="absolute inset-0 rounded-3xl overflow-hidden"
+                    className="absolute inset-0 rounded-2xl overflow-hidden"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
@@ -146,8 +146,8 @@ export function EmotionalEntry({ onEmotionSelect, onQuickAccess, darkMode = fals
                 )}
 
                 <div className="relative">
-                  <div className="text-3xl md:text-5xl mb-1 md:mb-3">{emotion.icon}</div>
-                  <h3 className="font-medium text-slate-700 text-xs md:text-base">{emotion.label}</h3>
+                  <div className="text-2xl md:text-3xl mb-1">{emotion.icon}</div>
+                  <h3 className="font-medium text-slate-700 text-[9px] md:text-xs">{emotion.label}</h3>
                 </div>
 
                 {/* Ripple effect on selection */}

@@ -113,12 +113,12 @@ export function MentorshipPanel({ darkMode = false }: MentorshipPanelProps) {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6"
         >
-          <h1 className="text-xl md:text-4xl mb-2 bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent font-bold">
+          <h1 className="text-base md:text-2xl mb-1 bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent font-bold">
             Mentorship & Guidance
           </h1>
-          <p className="text-xs md:text-base text-slate-600">Connect with scholars for personalized Qur'an learning</p>
+          <p className="text-[10px] md:text-sm text-slate-600">Connect with scholars for personalized Qur'an learning</p>
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-6">
@@ -127,9 +127,9 @@ export function MentorshipPanel({ darkMode = false }: MentorshipPanelProps) {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/50"
+              className="bg-white/80 backdrop-blur-xl rounded-lg p-4 md:p-6 shadow-lg border border-white/50"
             >
-              <h2 className="text-lg text-slate-800 mb-4">Available Mentors</h2>
+              <h2 className="text-sm md:text-base text-slate-800 mb-3 font-semibold">Available Mentors</h2>
               
               <div className="space-y-3">
                 {mentors.length === 0 && (

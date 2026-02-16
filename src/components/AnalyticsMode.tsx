@@ -47,39 +47,39 @@ export function AnalyticsMode({ darkMode = false }: AnalyticsModeProps) {
           className="flex items-center justify-between mb-8"
         >
           <div>
-            <h1 className={`text-xl md:text-4xl font-bold mb-2 ${
+            <h1 className={`text-base md:text-2xl font-bold mb-1 ${
               darkMode 
                 ? 'bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent'
                 : 'bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent'
             }`}>
               Qur'an Witness Mode
             </h1>
-            <p className={`text-xs md:text-base ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-[10px] md:text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
               Deep insights into your spiritual journey
             </p>
           </div>
         </motion.div>
 
         {/* Key Metrics */}
-        <div className="grid md:grid-cols-4 gap-4 mb-8">
+        <div className="grid md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8\">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className={`rounded-2xl p-6 shadow-xl border ${
+            className={`rounded-lg p-3 md:p-4 shadow-xl border ${
               darkMode 
                 ? 'bg-slate-800/50 backdrop-blur-xl border-slate-700' 
                 : 'bg-white/80 backdrop-blur-xl border-white/50'
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <Eye className={`w-6 h-6 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
-              <TrendingUp className={`w-4 h-4 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+            <div className="flex items-center justify-between mb-2">
+              <Eye className={`w-4 h-4 md:w-5 md:h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+              <TrendingUp className={`w-3 h-3 md:w-4 md:h-4 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
             </div>
-            <p className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
+            <p className={`text-xl md:text-2xl font-bold mb-0.5 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
               {totalVisited}
             </p>
-            <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
               Ayahs Visited
             </p>
           </motion.div>
@@ -98,10 +98,10 @@ export function AnalyticsMode({ darkMode = false }: AnalyticsModeProps) {
               <EyeOff className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-600'}`} />
               <TrendingDown className={`w-4 h-4 ${darkMode ? 'text-red-400' : 'text-red-600'}`} />
             </div>
-            <p className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
+            <p className={`text-xl md:text-2xl font-bold mb-0.5 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
               {totalSkipped}
             </p>
-            <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
               Ayahs Skipped
             </p>
           </motion.div>
@@ -116,14 +116,14 @@ export function AnalyticsMode({ darkMode = false }: AnalyticsModeProps) {
                 : 'bg-white/80 backdrop-blur-xl border-white/50'
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <Heart className={`w-6 h-6 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
-              <TrendingUp className={`w-4 h-4 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+            <div className="flex items-center justify-between mb-2">
+              <Heart className={`w-4 h-4 md:w-5 md:h-5 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+              <TrendingUp className={`w-3 h-3 md:w-4 md:h-4 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
             </div>
-            <p className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
+            <p className={`text-xl md:text-2xl font-bold mb-0.5 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
               {totalRevisited}
             </p>
-            <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
               Ayahs Revisited
             </p>
           </motion.div>
@@ -138,14 +138,14 @@ export function AnalyticsMode({ darkMode = false }: AnalyticsModeProps) {
                 : 'bg-white/80 backdrop-blur-xl border-white/50'
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <Zap className={`w-6 h-6 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
-              <Calendar className={`w-4 h-4 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
+            <div className="flex items-center justify-between mb-2">
+              <Zap className={`w-4 h-4 md:w-5 md:h-5 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
+              <Calendar className={`w-3 h-3 md:w-4 md:h-4 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
             </div>
-            <p className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
+            <p className={`text-xl md:text-2xl font-bold mb-0.5 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
               {Math.round((totalRevisited / totalVisited) * 100)}%
             </p>
-            <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
               Engagement Rate
             </p>
           </motion.div>

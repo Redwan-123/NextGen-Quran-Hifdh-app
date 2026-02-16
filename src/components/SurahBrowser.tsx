@@ -304,9 +304,9 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
     <div className="min-h-screen bg-gradient-to-br from-[#5a1a8c] via-[#7d2ba3] to-[#3a0d5c] !text-white">
       {!readingSurah && (
         <div className="max-w-7xl mx-auto px-3 md:px-6 pb-16">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 pt-4 md:pt-8">
-          <h1 className="text-lg md:text-5xl lg:text-6xl font-bold !text-white mb-2">Browse the Qur'an</h1>
-          <p className="text-xs md:text-lg !text-purple-200">Explore and read the Holy Quran</p>
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 pt-2 md:pt-6">
+          <h1 className="text-base md:text-3xl lg:text-4xl font-bold !text-white mb-1">Browse the Qur'an</h1>
+          <p className="text-[10px] md:text-sm !text-purple-200">Explore and read the Holy Quran</p>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="space-y-4 mb-8">
@@ -361,28 +361,28 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className={`relative mb-10 rounded-[32px] p-6 md:p-8 shadow-lg overflow-hidden border bg-gradient-to-br from-purple-600/40 to-purple-900/40 border-purple-400/50`}
+            className={`relative mb-8 rounded-2xl p-3 md:p-6 shadow-lg overflow-hidden border bg-gradient-to-br from-purple-600/40 to-purple-900/40 border-purple-400/50`}
           >
             <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(168,85,247,0.4), transparent 60%)' }} />
-            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
               <div className="flex-1">
-                <p className="uppercase tracking-[0.35em] text-[11px] !text-purple-200 mb-3">
+                <p className="uppercase tracking-[0.35em] text-[9px] !text-purple-200 mb-2">
                   {hasReadingHistory ? 'Continue reading' : 'Start your journey'}
                 </p>
-                <div className="flex flex-wrap items-baseline gap-3 !text-white">
-                  <h3 className="text-2xl md:text-3xl font-semibold !text-white">{continueSurah.transliteration}</h3>
-                  <span className="text-sm !text-purple-100">{continueSurah.name} • {continueSurah.type}</span>
+                <div className="flex flex-wrap items-baseline gap-2 !text-white">
+                  <h3 className="text-base md:text-2xl font-semibold !text-white">{continueSurah.transliteration}</h3>
+                  <span className="text-[10px] md:text-sm !text-purple-100">{continueSurah.name} • {continueSurah.type}</span>
                 </div>
-                <p className="text-sm !text-purple-100 mt-2">
+                <p className="text-[10px] md:text-sm !text-purple-100 mt-1">
                   {hasReadingHistory
                     ? `Ayah ${continueAyah} • ${continueSurah.totalVerses - continueAyah} left in this surah`
                     : 'Pick up from the very first revelation and we will track every ayah you complete.'}
                 </p>
                 {hasReadingHistory && (
                   <div className="mt-5">
-                    <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.3em] !text-purple-200 mb-2">
+                    <div className="flex items-center justify-between text-[9px] uppercase tracking-[0.2em] !text-purple-200 mb-2">
                       <span>Progress</span>
-                      <span>{lastReadProgress}% complete</span>
+                      <span>{lastReadProgress}%</span>
                     </div>
                     <div className="h-1.5 bg-purple-800/50 rounded-full overflow-hidden">
                       <div
@@ -395,17 +395,18 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
               </div>
               <Button
                 onClick={handleResumeClick}
-                className="bg-purple-500 !text-white hover:bg-purple-600 shadow-lg shadow-purple-500/30 px-6 py-4 rounded-2xl text-base font-semibold flex items-center gap-2"
+                className="bg-purple-500 !text-white hover:bg-purple-600 shadow-lg shadow-purple-500/30 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
               >
-                <Play className="w-4 h-4 !text-white" />
-                {hasReadingHistory ? 'Resume' : 'Start now'}
+                <Play className="w-3 h-3 !text-white" />
+                <span className="hidden md:inline">{hasReadingHistory ? 'Resume' : 'Start now'}</span>
+                <span className="md:hidden">{hasReadingHistory ? '▶' : '▶'}</span>
               </Button>
             </div>
           </motion.div>
         )}
 
         {viewMode === 'surah' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">
             {filteredSurahs.map((surah, index) => {
               const isLastRead = lastRead?.surah === surah.number;
               return (
@@ -416,26 +417,23 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
                   transition={{ delay: 0.2 + index * 0.02 }}
                   whileHover={{ scale: 1.02 }}
                   onClick={() => handleOpenSurah(surah)}
-                  className={`relative w-full rounded-2xl p-4 md:p-6 border shadow-md hover:shadow-xl text-center flex flex-col items-center justify-center transition-all bg-white/10 backdrop-blur-md border-purple-400/30 hover:border-purple-400/60 hover:bg-white/15`}
+                  className={`relative w-full rounded-xl p-2 md:p-4 border shadow-md hover:shadow-xl text-center flex flex-col items-center justify-center transition-all bg-white/10 backdrop-blur-md border-purple-400/30 hover:border-purple-400/60 hover:bg-white/15`}
                 >
-                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center !text-white font-bold text-lg md:text-xl shadow-lg mb-3 md:mb-4">
+                  <div className="w-8 h-8 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center !text-white font-bold text-xs md:text-sm shadow-lg mb-2 md:mb-3">
                     {surah.number}
                   </div>
-                  <div className="space-y-2 w-full">
-                    <h3 className="text-3xl md:text-5xl font-arabic !text-white mb-2 md:mb-3 font-bold" dir="rtl">
+                  <div className="space-y-1 w-full">
+                    <h3 className="text-sm md:text-xl font-arabic !text-white mb-1 md:mb-2 font-bold" dir="rtl">
                       {surah.name}
                     </h3>
-                    <p className="font-semibold !text-white text-sm md:text-lg">{surah.transliteration}</p>
-                    <div className="flex items-center justify-center gap-2">
-                      <span
-                        className={`text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-tight ${
+                    <p className="font-semibold !text-white text-[10px] md:text-xs">{surah.transliteration}</p>
+                    <span
+                        className={`text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-tight ${
                           surah.type === 'Meccan' ? 'bg-purple-300/30 !text-purple-100' : 'bg-emerald-400/30 !text-emerald-100'
                         }`}
                       >
                         {surah.type}
                       </span>
-                      <span className="text-xs !text-purple-200">{surah.totalVerses} Ayahs</span>
-                    </div>
                   </div>
                 </motion.button>
               );

@@ -144,41 +144,39 @@ export function SurahReader({
     <div className="surah-reader-modal fixed inset-0 z-[100000] flex flex-col text-white" style={{ backgroundImage: backgroundGradient }}>
       <div className="pointer-events-none absolute inset-0 opacity-70" style={{ backgroundImage: glowOverlay }} />
       <div className="relative z-[1] flex h-full flex-col">
-        <header className="surah-reader-header flex flex-col gap-4 px-5 py-6 border-b border-white/10 sm:flex-row sm:items-center sm:gap-8 sm:px-10">
-          <div className="flex items-center gap-4">
+        <header className="surah-reader-header flex flex-col gap-2 px-3 py-3 border-b border-white/10 sm:gap-4 sm:px-6 sm:py-4">
+          <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/5 text-white/80 transition hover:text-white"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/25 bg-white/5 text-white/80 transition hover:text-white"
               aria-label="Close reader"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </button>
-            <div className="space-y-1 text-left">
-              <p className="reader-sans text-[0.65rem] uppercase tracking-[0.45em] text-white/60">{surahType}</p>
-              <p className="surah-reader-title reader-sans font-semibold text-white leading-tight">{surahName}</p>
-              <p className="surah-reader-title-arabic font-arabic text-white leading-tight">{surahNameArabic}</p>
+            <div className="space-y-0.5 text-left">
+              <p className="reader-sans text-[0.55rem] uppercase tracking-[0.35em] text-white/60">{surahType}</p>
+              <p className="surah-reader-title reader-sans font-semibold text-xs sm:text-sm text-white leading-tight">{surahName}</p>
+              <p className="surah-reader-title-arabic font-arabic text-[11px] sm:text-sm text-white leading-tight">{surahNameArabic}</p>
             </div>
           </div>
         </header>
 
-        <main className="surah-reader-main flex-1 overflow-y-auto px-4 py-8 pb-16 sm:px-10 sm:py-12 sm:pb-20 pt-12 md:pt-16">
+        <main className="surah-reader-main flex-1 overflow-y-auto px-3 py-6 pb-12 sm:px-6 sm:py-8 sm:pb-16 md:px-8 md:py-10">
           <div className="mx-auto w-full max-w-5xl">
-            <section className="surah-reader-hero text-center space-y-4 md:space-y-8 mb-16">
-              <p className="reader-sans text-[0.65rem] md:text-[0.75rem] uppercase tracking-[0.6em] text-white/60">{surahType} • {verseCountDisplay}</p>
-              <p className="surah-reader-hero-title reader-display text-5xl md:text-7xl xl:text-8xl font-bold text-white leading-tight">{surahName}</p>
-              <p className="surah-reader-hero-subtitle font-arabic text-4xl md:text-6xl xl:text-7xl text-white leading-relaxed">{surahNameArabic}</p>
-              <p className="surah-reader-hero-description reader-sans text-sm md:text-base text-white/70 mt-6 md:mt-10">{surahTranslation || 'Reflect on every ayah with clarity.'}</p>
+            <section className="surah-reader-hero text-center space-y-2 sm:space-y-4 md:space-y-6 mb-8 md:mb-12">
+              <p className="reader-sans text-[0.5rem] sm:text-[0.6rem] md:text-[0.75rem] uppercase tracking-[0.4em] text-white/60">{surahType} • {verseCountDisplay}</p>
+              <p className="surah-reader-hero-title reader-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">{surahName}</p>
+              <p className="surah-reader-hero-subtitle font-arabic text-lg sm:text-2xl md:text-3xl lg:text-4xl text-white leading-relaxed">{surahNameArabic}</p>
+              <p className="surah-reader-hero-description reader-sans text-xs sm:text-sm md:text-base text-white/70 mt-3 md:mt-6">{surahTranslation || 'Reflect on every ayah with clarity.'}</p>
             </section>
 
-            {showBismillah && (
-              <div className="mt-16 mb-16 flex justify-center">
-                <div className="surah-reader-bismillah inline-flex items-center rounded-2xl border border-white/20 bg-white/8 px-12 py-6 font-arabic shadow-[0_20px_70px_rgba(12,0,45,0.55)]">
+              <div className="mt-10 sm:mt-12 md:mt-16 mb-10 md:mb-12 flex justify-center">
+                <div className="surah-reader-bismillah inline-flex items-center rounded-xl border border-white/20 bg-white/8 px-6 sm:px-10 py-4 sm:py-6 font-arabic text-sm sm:text-base md:text-xl shadow-[0_20px_70px_rgba(12,0,45,0.55)]">
                   بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
                 </div>
               </div>
-            )}
 
-            <section className="mt-16 space-y-10">
+            <section className="mt-10 sm:mt-12 md:mt-16 space-y-6 sm:space-y-8 md:space-y-10">
               {shouldRenderPlaceholders && isLoadingVerses && (
                 <p className="text-center text-sm uppercase tracking-[0.4em] text-white/60">Loading verses…</p>
               )}
@@ -199,34 +197,34 @@ export function SurahReader({
                     onClick={() => handleVerseSelect(index)}
                   >
                     <div className="surah-reader-verse-content flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                      <div className="flex flex-1 items-start gap-5">
-                        <div className="relative pt-1">
+                      <div className="flex flex-1 items-start gap-3 sm:gap-4">
+                        <div className="relative pt-0.5">
                           <div
-                            className={`surah-reader-verse-number flex h-12 w-12 items-center justify-center rounded-full text-base font-semibold shadow-lg sm:h-14 sm:w-14 ${
+                            className={`surah-reader-verse-number flex h-9 w-9 items-center justify-center rounded-full text-xs sm:text-sm font-semibold shadow-lg sm:h-10 sm:w-10 md:h-12 md:w-12 ${
                               isActive ? 'bg-[#5313a0] text-white' : 'bg-white/15 text-white'
                             }`}
                           >
                             {verseNumber}
                           </div>
-                          <span className="pointer-events-none absolute left-1/2 top-full hidden h-11 w-px -translate-x-1/2 translate-y-2 bg-white/25 md:block" />
+                          <span className="pointer-events-none absolute left-1/2 top-full hidden h-8 w-px -translate-x-1/2 translate-y-1.5 bg-white/25 md:block" />
                         </div>
-                        <div className="surah-reader-verse-details space-y-3">
+                        <div className="surah-reader-verse-details space-y-2">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleTranslation(index);
                             }}
-                            className="surah-reader-action-btn reader-sans uppercase tracking-[0.35em] font-semibold px-4 py-2 rounded-full border border-white/25 bg-white/6 text-white/70 transition-all hover:border-white/50 hover:bg-white/12 hover:text-white/90"
+                            className="surah-reader-action-btn reader-sans uppercase tracking-[0.25em] font-semibold px-2.5 py-1.5 text-[10px] sm:text-xs rounded-full border border-white/25 bg-white/6 text-white/70 transition-all hover:border-white/50 hover:bg-white/12 hover:text-white/90"
                           >
-                            {expandedTranslations.has(index) ? '✓ Translation' : 'See Translation'}
+                            {expandedTranslations.has(index) ? '✓' : 'Tr'}
                           </button>
                           {expandedTranslations.has(index) && (
-                            <p className="surah-reader-expansion-text reader-sans text-lg leading-relaxed text-white/85 sm:text-xl mt-5 pt-5 border-t border-white/10">{translation}</p>
+                            <p className="surah-reader-expansion-text reader-sans text-xs sm:text-sm leading-relaxed text-white/85 mt-3 pt-3 border-t border-white/10">{translation}</p>
                           )}
                         </div>
                       </div>
 
-                      <p className="surah-reader-verse-arabic font-arabic text-4xl leading-[2.2] text-white sm:text-5xl md:text-6xl md:max-w-[50%] text-right">
+                      <p className="surah-reader-verse-arabic font-arabic text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-[2.2] text-white text-right">
                         {ayahArabic}
                       </p>
                     </div>

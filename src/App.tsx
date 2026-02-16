@@ -63,7 +63,7 @@ export default function App() {
         animate={{ y: 0 }}
         className="fixed top-6 left-1/2 -translate-x-1/2 z-50"
       >
-        <div className="rounded-full border border-white/10 px-2 py-2 flex items-center gap-1 bg-[#4a167a]/90 shadow-[0_25px_70px_rgba(37,3,68,0.55)] backdrop-blur-2xl">
+        <div className="rounded-full border border-white/10 px-1.5 py-1.5 flex items-center gap-0.5 bg-[#4a167a]/90 shadow-[0_25px_70px_rgba(37,3,68,0.55)] backdrop-blur-2xl">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentScreen === item.id;
@@ -76,7 +76,7 @@ export default function App() {
                 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`relative px-4 py-2.5 rounded-full transition-all reader-sans text-[0.7rem] font-semibold uppercase tracking-[0.35em] ${
+                className={`relative px-3 py-1.5 rounded-full transition-all reader-sans text-[0.6rem] font-semibold uppercase tracking-[0.25em] ${
                   isActive 
                     ? 'text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.35)]' 
                     : 'text-purple-100/70 hover:text-white'
@@ -101,7 +101,7 @@ export default function App() {
       )}
 
       {/* Spacer to push content below fixed nav */}
-      {currentScreen !== 'landing' && <div className="h-28 md:h-40"></div>}
+      {currentScreen !== 'landing' && <div className="h-32 sm:h-36 md:h-44"></div>}
 
       {/* Settings Icon - Mobile */}
       {currentScreen !== 'landing' && (
