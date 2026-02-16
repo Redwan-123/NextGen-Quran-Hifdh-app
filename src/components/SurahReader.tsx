@@ -161,13 +161,13 @@ export function SurahReader({
           </div>
         </header>
 
-        <main className="surah-reader-main flex-1 overflow-y-auto px-4 py-12 pb-16 sm:px-10 sm:py-16 sm:pb-20">
+        <main className="surah-reader-main flex-1 overflow-y-auto px-4 py-8 pb-16 sm:px-10 sm:py-12 sm:pb-20 pt-12 md:pt-16">
           <div className="mx-auto w-full max-w-5xl">
-            <section className="surah-reader-hero text-center space-y-6 mb-16">
-              <p className="reader-sans text-[0.7rem] uppercase tracking-[0.6em] text-white/50">{surahType} • {verseCountDisplay}</p>
-              <p className="surah-reader-hero-title reader-display text-white leading-tight">{surahName}</p>
-              <p className="surah-reader-hero-subtitle font-arabic text-white leading-relaxed">{surahNameArabic}</p>
-              <p className="surah-reader-hero-description reader-sans text-white/60 mt-8">{surahTranslation || 'Reflect on every ayah with clarity.'}</p>
+            <section className="surah-reader-hero text-center space-y-4 md:space-y-8 mb-16">
+              <p className="reader-sans text-[0.65rem] md:text-[0.75rem] uppercase tracking-[0.6em] text-white/60">{surahType} • {verseCountDisplay}</p>
+              <p className="surah-reader-hero-title reader-display text-5xl md:text-7xl xl:text-8xl font-bold text-white leading-tight">{surahName}</p>
+              <p className="surah-reader-hero-subtitle font-arabic text-4xl md:text-6xl xl:text-7xl text-white leading-relaxed">{surahNameArabic}</p>
+              <p className="surah-reader-hero-description reader-sans text-sm md:text-base text-white/70 mt-6 md:mt-10">{surahTranslation || 'Reflect on every ayah with clarity.'}</p>
             </section>
 
             {showBismillah && (

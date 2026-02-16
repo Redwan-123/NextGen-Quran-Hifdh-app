@@ -101,7 +101,7 @@ export default function App() {
       )}
 
       {/* Spacer to push content below fixed nav */}
-      {currentScreen !== 'landing' && <div className="h-32 md:h-36 lg:h-40"></div>}
+      {currentScreen !== 'landing' && <div className="h-28 md:h-40"></div>}
 
       {/* Settings Icon - Mobile */}
       {currentScreen !== 'landing' && (
@@ -109,9 +109,11 @@ export default function App() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           onClick={() => setCurrentScreen('settings')}
-          className={`md:hidden fixed top-6 right-6 z-50 w-12 h-12 rounded-full shadow-lg flex items-center justify-center border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="md:hidden fixed top-8 right-6 z-50 text-2xl hover:scale-110 transition-transform"
         >
-          <span className="text-xl">⚙️</span>
+          ⚙️
         </motion.button>
       )}
 

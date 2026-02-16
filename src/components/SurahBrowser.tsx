@@ -303,9 +303,9 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#5a1a8c] via-[#7d2ba3] to-[#3a0d5c] !text-white">
       {!readingSurah && (
-        <div className="max-w-7xl mx-auto px-4 md:px-6 pb-16">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 pt-8">
-          <h1 className="text-xl md:text-5xl lg:text-6xl font-bold !text-white mb-2">Browse the Qur'an</h1>
+        <div className="max-w-7xl mx-auto px-3 md:px-6 pb-16">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 pt-4 md:pt-8">
+          <h1 className="text-lg md:text-5xl lg:text-6xl font-bold !text-white mb-2">Browse the Qur'an</h1>
           <p className="text-xs md:text-lg !text-purple-200">Explore and read the Holy Quran</p>
         </motion.div>
 
@@ -416,16 +416,16 @@ export function SurahBrowser({ onSurahSelect, darkMode = false }: SurahBrowserPr
                   transition={{ delay: 0.2 + index * 0.02 }}
                   whileHover={{ scale: 1.02 }}
                   onClick={() => handleOpenSurah(surah)}
-                  className={`relative w-full rounded-2xl p-6 border shadow-md hover:shadow-xl text-center flex flex-col items-center justify-center transition-all bg-white/10 backdrop-blur-md border-purple-400/30 hover:border-purple-400/60 hover:bg-white/15`}
+                  className={`relative w-full rounded-2xl p-4 md:p-6 border shadow-md hover:shadow-xl text-center flex flex-col items-center justify-center transition-all bg-white/10 backdrop-blur-md border-purple-400/30 hover:border-purple-400/60 hover:bg-white/15`}
                 >
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center !text-white font-bold text-xl shadow-lg mb-4">
+                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center !text-white font-bold text-lg md:text-xl shadow-lg mb-3 md:mb-4">
                     {surah.number}
                   </div>
-                  <div className="space-y-2">
-                    <h3 className="text-2xl font-arabic !text-white mb-2" dir="rtl">
+                  <div className="space-y-2 w-full">
+                    <h3 className="text-3xl md:text-5xl font-arabic !text-white mb-2 md:mb-3 font-bold" dir="rtl">
                       {surah.name}
                     </h3>
-                    <p className="font-semibold !text-white text-lg">{surah.transliteration}</p>
+                    <p className="font-semibold !text-white text-sm md:text-lg">{surah.transliteration}</p>
                     <div className="flex items-center justify-center gap-2">
                       <span
                         className={`text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-tight ${
