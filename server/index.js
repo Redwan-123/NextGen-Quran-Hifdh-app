@@ -2,12 +2,16 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import Sentiment from 'sentiment';
+import recitationRoutes from './routes/recitationRoutes.js';
+import { errorHandler } from './utils/errors.js';
 
 const app = express();
 const port = process.env.PORT || 4000;
 
 app.use(bodyParser.json());
 app.use(cors());
+
+app.use(recitationRoutes);
 
 const sentiment = new Sentiment();
 
@@ -234,6 +238,8 @@ app.get('/api/audio', async (req, res) => {
 
   return res.status(404).json({ error: 'No playable audio found for given reciter/verse' });
 });
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Emotion API listening at http://localhost:${port}`);
