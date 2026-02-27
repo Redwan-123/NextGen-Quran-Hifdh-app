@@ -1,19 +1,25 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LoginPage } from './components/LoginPage';
 import { LandingPage } from './components/LandingPage';
 import { EmotionalEntry } from './components/EmotionalEntry';
 import { AyahExperience } from './components/AyahExperience';
-import { HifdhDashboard } from './components/HifdhDashboard';
+import { TeacherDashboard } from './components/TeacherDashboard';
 import { MentorshipPanel } from './components/MentorshipPanel';
 import { AnalyticsMode } from './components/AnalyticsMode';
 import { SurahBrowser } from './components/SurahBrowser';
 import { FeatureShowcase } from './components/FeatureShowcase';
 import { Settings } from './components/Settings';
 
-type Screen = 'landing' | 'home' | 'ayah' | 'hifdh' | 'mentorship' | 'analytics' | 'surah-browser' | 'feature-showcase' | 'settings';
+type Screen = 'landing' | 'login' | 'home' | 'ayah' | 'dashboard' | 'mentorship' | 'analytics' | 'surah-browser' | 'feature-showcase' | 'settings';
 
-export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
+function AppContent() {
+  const { user, loading: authLoading } = useAuth();
+  const [currentScreen, setCurrentScreen] = useState<Screen>(() => {
+    // If already logged in, skip landing
+    return 'landing';
+  });
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -22,6 +28,17 @@ export default function App() {
     }
     return false;
   });
+
+  // When user logs in, redirect away from landing/login
+  useEffect(() => {
+    if (user && (currentScreen === 'landing' || currentScreen === 'login')) {
+      setCurrentScreen('dashboard');
+    }
+    if (!user && currentScreen !== 'landing' && currentScreen !== 'login') {
+      setCurrentScreen('landing');
+    }
+  }, [user, currentScreen]);
+
 
   // Persist darkMode to localStorage and toggle dark class
   useEffect(() => {
@@ -32,6 +49,18 @@ export default function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0f051a]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+          className="w-10 h-10 border-2 border-purple-500/30 border-t-purple-500 rounded-full"
+        />
+      </div>
+    );
+  }
 
   const handleEmotionSelect = (emotionId: string) => {
     setSelectedEmotion(emotionId);
@@ -45,10 +74,9 @@ export default function App() {
   };
 
   const navigationItems = [
-    { id: 'landing' as Screen, label: 'Start', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>🏁</span> },
     { id: 'home' as Screen, label: 'Emotions', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>🤲</span> },
     { id: 'surah-browser' as Screen, label: 'Browse', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>📚</span> },
-    { id: 'hifdh' as Screen, label: 'Hifdh', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>📋</span> },
+    { id: 'dashboard' as Screen, label: 'Dashboard', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>📋</span> },
     { id: 'mentorship' as Screen, label: 'Mentors', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>🧑‍💼</span> },
     { id: 'analytics' as Screen, label: 'Insights', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>📈</span> },
     { id: 'settings' as Screen, label: 'Settings', icon: (props: any) => <span {...props} className={props.className + " flex items-center justify-center grayscale-0 text-lg"} style={{ fontSize: window.innerWidth < 768 ? '0.9em' : '1.2em' }}>⚙️</span> },
@@ -56,8 +84,31 @@ export default function App() {
 
   return (
     <div className={`relative min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0f1117]' : 'bg-slate-50'}`}>
-      {/* Floating Navigation - Hidden on Landing Page */}
-      {currentScreen !== 'landing' && (
+      {/* Floating Navigation - Hidden on Landing/Login */}
+      {currentScreen !== 'landing' && currentScreen !== 'login' && (
+      <>
+      {/* Top-right brand badge */}
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="fixed top-5 right-5 z-50 flex items-center gap-2.5"
+      >
+        <motion.div 
+          className="w-9 h-9 rounded-xl bg-purple-600/80 backdrop-blur-md border border-purple-400/25 flex items-center justify-center shadow-lg shadow-purple-900/30 text-white"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/>
+            <ellipse cx="12" cy="12" rx="4" ry="9" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M3 12H21" stroke="currentColor" strokeWidth="1.5"/>
+          </svg>
+        </motion.div>
+        <span className="text-sm font-extrabold text-white tracking-tight hidden sm:inline">
+          Quran<span className="text-amber-400">Verse</span>
+        </span>
+      </motion.div>
+
       <motion.div
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -98,16 +149,26 @@ export default function App() {
           })}
         </div>
       </motion.div>
+      </>
       )}
 
       {/* Spacer to push content below fixed nav */}
-      {currentScreen !== 'landing' && <div className="h-32 sm:h-36 md:h-44"></div>}
+      {currentScreen !== 'landing' && currentScreen !== 'login' && <div className="h-32 sm:h-36 md:h-44"></div>}
 
       {/* Screen Transitions */}
       <AnimatePresence mode="wait">
         {currentScreen === 'landing' && (
           <motion.div key="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-            <LandingPage onGetStarted={() => setCurrentScreen('home')} />
+            <LandingPage
+              onGetStarted={() => user ? setCurrentScreen('home') : setCurrentScreen('login')}
+              onLogin={!user ? () => setCurrentScreen('login') : undefined}
+            />
+          </motion.div>
+        )}
+
+        {currentScreen === 'login' && !user && (
+          <motion.div key="login" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+            <LoginPage onBack={() => setCurrentScreen('landing')} />
           </motion.div>
         )}
 
@@ -123,9 +184,9 @@ export default function App() {
           </motion.div>
         )}
 
-        {currentScreen === 'hifdh' && (
-          <motion.div key="hifdh" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}>
-            <HifdhDashboard darkMode={darkMode} />
+        {currentScreen === 'dashboard' && (
+          <motion.div key="dashboard" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}>
+            <TeacherDashboard darkMode={darkMode} />
           </motion.div>
         )}
 
@@ -161,24 +222,20 @@ export default function App() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <Settings darkMode={darkMode} onDarkModeToggle={() => setDarkMode(!darkMode)} />
+            <Settings darkMode={darkMode} onDarkModeToggle={() => setDarkMode(!darkMode)} onSignOut={() => setCurrentScreen('landing')} />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Decorative Elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        <motion.div
-          className={`absolute top-20 right-20 w-96 h-96 rounded-full blur-3xl ${darkMode ? 'bg-purple-500/5' : 'bg-purple-300/10'}`}
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className={`absolute bottom-20 left-20 w-96 h-96 rounded-full blur-3xl ${darkMode ? 'bg-violet-500/5' : 'bg-violet-300/10'}`}
-          animate={{ scale: [1.2, 1, 1.2], opacity: [0.5, 0.3, 0.5] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
+      {/* Decorative Elements Removed */}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }

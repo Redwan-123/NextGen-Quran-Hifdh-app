@@ -4,9 +4,10 @@ import { Button } from './ui/button';
 
 interface LandingPageProps {
   onGetStarted: () => void;
+  onLogin?: () => void;
 }
 
-export function LandingPage({ onGetStarted }: LandingPageProps) {
+export function LandingPage({ onGetStarted, onLogin }: LandingPageProps) {
   const features = [
     {
       icon: Heart,
@@ -102,6 +103,22 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
               </span>
             </div>
           </motion.div>
+
+          {onLogin && (
+            <motion.button
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(168,85,247,0.4)' }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onLogin}
+              className="px-6 md:px-8 py-2.5 md:py-3 rounded-full bg-purple-600 text-white font-bold text-sm md:text-base tracking-wide shadow-xl shadow-purple-500/25 hover:shadow-purple-500/40 transition-all border border-white/10 flex items-center gap-2"
+            >
+              <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3-3h-9m9 0-3-3m3 3-3 3" />
+              </svg>
+              Login
+            </motion.button>
+          )}
         </nav>
 
         {/* Hero Section */}

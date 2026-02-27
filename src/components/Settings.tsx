@@ -1,14 +1,17 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Moon, Sun, Bell, Volume2, BookOpen, User, Info, Trash2, Bookmark as BookmarkIcon } from 'lucide-react';
+import { Moon, Sun, Bell, Volume2, BookOpen, User, Info, Trash2, Bookmark as BookmarkIcon, LogOut } from 'lucide-react';
 import { Switch } from './ui/switch';
+import { useAuth } from '../contexts/AuthContext';
 
 interface SettingsProps {
   darkMode: boolean;
   onDarkModeToggle: () => void;
+  onSignOut?: () => void;
 }
 
-export function Settings({ darkMode, onDarkModeToggle }: SettingsProps) {
+export function Settings({ darkMode, onDarkModeToggle, onSignOut }: SettingsProps) {
+  const { user, teacher, signOut } = useAuth();
   const [bookmarks, setBookmarks] = useState<any[]>([]);
 
   useEffect(() => {
@@ -114,6 +117,58 @@ export function Settings({ darkMode, onDarkModeToggle }: SettingsProps) {
             </div>
           </div>
         </div>
+
+          {/* Account Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className={`rounded-xl p-4 md:p-6 shadow-xl border transition-colors duration-300 ${
+              darkMode ? 'bg-purple-900/20 border-purple-500/20 backdrop-blur-xl' : 'bg-white border-slate-100'
+            }`}
+          >
+            <h2 className={`text-sm md:text-lg font-bold mb-4 flex items-center gap-2 ${
+              darkMode ? 'text-white' : 'text-slate-800'
+            }`}>
+              <User className="w-4 h-4 text-purple-500" /> Account
+            </h2>
+
+            {/* User info */}
+            {user && (
+              <div className={`p-3 rounded-lg mb-4 flex items-center gap-3 ${
+                darkMode ? 'bg-white/5' : 'bg-slate-50'
+              }`}>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                    {(teacher?.full_name || user.email || 'T').charAt(0).toUpperCase()}
+                  </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`font-semibold text-sm truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {teacher?.full_name || 'Teacher'}
+                  </p>
+                  <p className={`text-xs truncate ${darkMode ? 'text-purple-300/50' : 'text-gray-500'}`}>
+                    {user.email}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Sign Out */}
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              onClick={async () => {
+                await signOut();
+                onSignOut?.();
+              }}
+              className={`w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+                darkMode
+                  ? 'bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20'
+                  : 'bg-red-50 border border-red-200 text-red-600 hover:bg-red-100'
+              }`}
+            >
+              <LogOut className="w-4 h-4" /> Sign Out
+            </motion.button>
+          </motion.div>
       </div>
     </div>
   );
