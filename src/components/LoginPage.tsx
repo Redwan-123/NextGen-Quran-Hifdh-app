@@ -45,28 +45,18 @@ export function LoginPage({ onBack }: LoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex items-center justify-center bg-gradient-to-br from-purple-900 via-[#1a0a2e] to-[#0f051a]">
-      {/* Animated background effects */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
       {/* Back button */}
       {onBack && (
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={onBack}
-          className="absolute top-6 left-6 z-20 px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white text-sm font-medium hover:bg-white/20 transition-all flex items-center gap-2"
+          className="absolute top-6 left-6 z-20 px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-700 transition-all flex items-center gap-2"
         >
           ← Back
         </motion.button>
       )}
-
-      {/* Islamic decorative border (top) */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/60 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/60 to-transparent" />
 
       {/* Main card */}
       <motion.div
@@ -75,10 +65,7 @@ export function LoginPage({ onBack }: LoginPageProps) {
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         className="relative z-10 w-full max-w-md mx-4"
       >
-        {/* Glowing border effect */}
-        <div className="absolute -inset-[2px] bg-gradient-to-b from-purple-500/40 via-amber-500/20 to-purple-500/40 rounded-3xl blur-sm" />
-        
-        <div className="relative bg-white rounded-3xl border border-gray-200 p-8 shadow-2xl shadow-purple-900/20">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-200 dark:border-gray-700 p-8 shadow-xl">
           
           {/* Logo / Branding */}
           <motion.div
@@ -88,7 +75,7 @@ export function LoginPage({ onBack }: LoginPageProps) {
             transition={{ delay: 0.2 }}
           >
             <motion.div
-              className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-100 to-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 shadow-lg shadow-purple-200/50"
+              className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-purple-100 dark:bg-purple-900 border border-purple-200 dark:border-purple-700 flex items-center justify-center text-purple-600 dark:text-purple-300 shadow-lg"
               animate={{ rotate: 360 }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
             >
@@ -98,24 +85,24 @@ export function LoginPage({ onBack }: LoginPageProps) {
                 <path d="M3 12H21" stroke="currentColor" strokeWidth="1.5"/>
               </svg>
             </motion.div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
               Quran <span className="text-amber-500">Teacher</span>
             </h1>
-            <p className="text-gray-500 text-sm mt-1 tracking-wide">
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 tracking-wide">
               Digital Mushaf • Student Tracking • Progress Analytics
             </p>
           </motion.div>
 
           {/* Tab switcher */}
-          <div className="flex bg-gray-100 rounded-xl p-1 mb-6 border border-gray-200">
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1 mb-6 border border-gray-200 dark:border-gray-600">
             {(['signin', 'signup'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => { setIsSignUp(tab === 'signup'); setError(''); setSuccess(''); }}
                 className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${
                   (tab === 'signin' && !isSignUp) || (tab === 'signup' && isSignUp)
-                    ? 'bg-white text-gray-900 shadow-md'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-md'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                 }`}
               >
                 {tab === 'signin' ? 'Sign In' : 'Create Account'}
@@ -130,7 +117,7 @@ export function LoginPage({ onBack }: LoginPageProps) {
                 initial={{ opacity: 0, y: -10, height: 0 }}
                 animate={{ opacity: 1, y: 0, height: 'auto' }}
                 exit={{ opacity: 0, y: -10, height: 0 }}
-                className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm"
+                className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm"
               >
                 {error}
               </motion.div>
@@ -140,7 +127,7 @@ export function LoginPage({ onBack }: LoginPageProps) {
                 initial={{ opacity: 0, y: -10, height: 0 }}
                 animate={{ opacity: 1, y: 0, height: 'auto' }}
                 exit={{ opacity: 0, y: -10, height: 0 }}
-                className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm"
+                className="mb-4 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-sm"
               >
                 {success}
               </motion.div>
@@ -158,14 +145,14 @@ export function LoginPage({ onBack }: LoginPageProps) {
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 uppercase tracking-wider">
                     Full Name
                   </label>
                   <input
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all duration-300"
+                    className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
                     placeholder="Sheikh Ahmad"
                   />
                 </motion.div>
@@ -173,7 +160,7 @@ export function LoginPage({ onBack }: LoginPageProps) {
             </AnimatePresence>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 uppercase tracking-wider">
                 Email
               </label>
               <input
@@ -181,13 +168,13 @@ export function LoginPage({ onBack }: LoginPageProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all duration-300"
+                className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
                 placeholder="teacher@example.com"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 uppercase tracking-wider">
                 Password
               </label>
               <input
@@ -196,7 +183,7 @@ export function LoginPage({ onBack }: LoginPageProps) {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all duration-300"
+                className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
                 placeholder="••••••••"
               />
             </div>
@@ -206,7 +193,7 @@ export function LoginPage({ onBack }: LoginPageProps) {
               disabled={loading}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold text-base shadow-xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:from-purple-700 hover:to-purple-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+              className="w-full py-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-base shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6"
             >
               {loading ? (
                 <motion.span
@@ -223,14 +210,14 @@ export function LoginPage({ onBack }: LoginPageProps) {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
+              <div className="w-full border-t border-gray-200 dark:border-gray-600"></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-4 bg-white text-gray-400 uppercase tracking-widest font-medium">or</span>
+              <span className="px-4 bg-white dark:bg-gray-800 text-gray-400 uppercase tracking-widest font-medium">or</span>
             </div>
           </div>
 
-          {/* Google Sign In - NOW SAME SIZE AS SIGN IN BUTTON */}
+          {/* Google Sign In */}
           <motion.button
             type="button"
             onClick={async () => {
@@ -240,7 +227,7 @@ export function LoginPage({ onBack }: LoginPageProps) {
             }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full py-4 rounded-xl bg-white border-2 border-gray-200 text-gray-700 font-bold text-base shadow-lg hover:shadow-xl hover:border-gray-300 hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-3"
+            className="w-full py-4 rounded-xl bg-gray-100 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-bold text-base hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 flex items-center justify-center gap-3"
           >
             <svg className="w-6 h-6" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -252,8 +239,8 @@ export function LoginPage({ onBack }: LoginPageProps) {
           </motion.button>
 
           {/* Footer decorative */}
-          <div className="mt-8 pt-6 border-t border-gray-100 text-center">
-            <p className="text-gray-400 text-sm" style={{ fontFamily: "'Scheherazade New', serif" }}>
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
+            <p className="text-gray-400 dark:text-gray-500 text-sm" style={{ fontFamily: "'Scheherazade New', serif" }}>
               بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
             </p>
           </div>
