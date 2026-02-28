@@ -377,15 +377,61 @@ export function StudentQuranView({ student, darkMode, onBack, teacherId }: Props
         )}
       </AnimatePresence>
 
-      {/* ── Mushaf Page (Quran.com API) ── */}
-      <QuranPage
-        page={currentPage}
-        darkMode={darkMode}
-        mistakes={mistakeInfos}
-        selectedAyah={selectedVerse ? { surah: selectedVerse.chapter_id, ayah: selectedVerse.verse_number } : null}
-        sessionActive={sessionActive}
-        onAyahClick={handleAyahClick}
-      />
+      {/* ── Mushaf Page Spread (Two-page book layout like real Quran) ── */}
+      <div className="hidden md:block">
+        {/* Desktop: Two-page spread */}
+        <div className={`relative rounded-lg overflow-hidden shadow-2xl ${
+          darkMode ? 'bg-[#0d0805] shadow-black/60' : 'bg-[#2a1f15] shadow-amber-900/40'
+        }`}>
+          {/* Book spine shadow in center */}
+          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-8 pointer-events-none z-10"
+            style={{
+              background: darkMode 
+                ? 'linear-gradient(to right, transparent, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.5) 60%, transparent)'
+                : 'linear-gradient(to right, transparent, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.3) 60%, transparent)'
+            }}
+          />
+          
+          <div className="flex">
+            {/* Right page (odd page - in Arabic Qurans, reading starts from right) */}
+            <div className="flex-1 p-1">
+              <QuranPage
+                page={currentPage % 2 === 1 ? currentPage : currentPage - 1}
+                darkMode={darkMode}
+                mistakes={mistakeInfos}
+                selectedAyah={selectedVerse ? { surah: selectedVerse.chapter_id, ayah: selectedVerse.verse_number } : null}
+                sessionActive={sessionActive}
+                onAyahClick={handleAyahClick}
+              />
+            </div>
+            
+            {/* Left page (even page) */}
+            <div className="flex-1 p-1">
+              <QuranPage
+                page={currentPage % 2 === 1 ? currentPage + 1 : currentPage}
+                darkMode={darkMode}
+                mistakes={mistakeInfos}
+                selectedAyah={selectedVerse ? { surah: selectedVerse.chapter_id, ayah: selectedVerse.verse_number } : null}
+                sessionActive={sessionActive}
+                onAyahClick={handleAyahClick}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Mobile: Single page view */}
+      <div className="md:hidden">
+        <QuranPage
+          page={currentPage}
+          darkMode={darkMode}
+          mistakes={mistakeInfos}
+          selectedAyah={selectedVerse ? { surah: selectedVerse.chapter_id, ayah: selectedVerse.verse_number } : null}
+          sessionActive={sessionActive}
+          onAyahClick={handleAyahClick}
+          compact
+        />
+      </div>
 
       {/* ── Mistake Panel (Bottom Sheet) ── */}
       <AnimatePresence>

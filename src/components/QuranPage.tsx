@@ -105,10 +105,13 @@ export function QuranPage({
   // ===== Loading =====
   if (loading) {
     return (
-      <div className={`rounded-3xl border overflow-hidden ${
-        darkMode ? 'bg-[#0d0a1a] border-amber-500/10' : 'bg-[#faf6ee] border-amber-200'
+      <div className={`relative overflow-hidden ${
+        darkMode ? 'bg-[#1a1509]' : 'bg-[#f8f3e6]'
       }`}>
-        <div className={`h-1.5 bg-gradient-to-r from-transparent via-amber-500/30 to-transparent`} />
+        {/* Ornate outer border */}
+        <div className={`absolute inset-0 border-[6px] ${darkMode ? 'border-amber-700/30' : 'border-amber-600/20'}`} />
+        <div className={`absolute inset-[6px] border-[2px] ${darkMode ? 'border-amber-600/20' : 'border-amber-500/15'}`} />
+        
         <div className="flex items-center justify-center py-32">
           <motion.div
             animate={{ rotate: 360 }}
@@ -116,7 +119,6 @@ export function QuranPage({
             className="w-8 h-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full"
           />
         </div>
-        <div className={`h-1.5 bg-gradient-to-r from-transparent via-amber-500/30 to-transparent`} />
       </div>
     );
   }
@@ -124,8 +126,8 @@ export function QuranPage({
   // ===== Error =====
   if (error) {
     return (
-      <div className={`rounded-3xl border p-10 text-center ${
-        darkMode ? 'bg-red-500/5 border-red-500/20 text-red-300' : 'bg-red-50 border-red-200 text-red-600'
+      <div className={`p-10 text-center ${
+        darkMode ? 'bg-red-500/5 text-red-300' : 'bg-red-50 text-red-600'
       }`}>
         <div className="text-3xl mb-3">⚠️</div>
         <p className="text-sm">{error}</p>
@@ -135,8 +137,8 @@ export function QuranPage({
 
   if (!pageData || pageData.verses.length === 0) {
     return (
-      <div className={`rounded-3xl border p-10 text-center ${
-        darkMode ? 'bg-white/5 border-white/10 text-white/50' : 'bg-gray-50 border-gray-200 text-gray-400'
+      <div className={`p-10 text-center ${
+        darkMode ? 'bg-white/5 text-white/50' : 'bg-gray-50 text-gray-400'
       }`}>
         <p className="text-sm">No verses found for page {page}.</p>
       </div>
@@ -145,78 +147,128 @@ export function QuranPage({
 
   // ===== Render =====
   return (
-    <div className={`rounded-3xl border overflow-hidden shadow-xl transition-colors duration-300 ${
+    <div className={`relative overflow-hidden shadow-2xl ${
       darkMode
-        ? 'bg-[#0d0a1a] border-amber-500/10 shadow-amber-900/10'
-        : 'bg-[#faf6ee] border-amber-200 shadow-amber-200/30'
-    }`}>
-      {/* Top ornament */}
-      <div className="relative h-3">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
-      </div>
+        ? 'bg-[#1a1509] shadow-black/50'
+        : 'bg-[#f8f3e6] shadow-amber-900/20'
+    }`} style={{ minHeight: '70vh' }}>
+      {/* ══════════════════════════════════════════════════════════════════════════════
+          ORNATE BORDER FRAME — Multiple nested borders like a real Quran page
+         ══════════════════════════════════════════════════════════════════════════════ */}
+      
+      {/* Outer thick border */}
+      <div className={`absolute inset-0 border-[8px] pointer-events-none ${
+        darkMode ? 'border-amber-700/40' : 'border-amber-700/25'
+      }`} />
+      
+      {/* Inner decorated border */}
+      <div className={`absolute inset-[8px] border-[3px] pointer-events-none ${
+        darkMode ? 'border-amber-600/30' : 'border-amber-600/20'
+      }`} />
+      
+      {/* Innermost thin border */}
+      <div className={`absolute inset-[14px] border-[1px] pointer-events-none ${
+        darkMode ? 'border-amber-500/20' : 'border-amber-500/15'
+      }`} />
 
-      {/* Page number header */}
-      <div className="flex items-center justify-between px-6 pt-3">
-        <span className={`text-[10px] tracking-[0.2em] uppercase ${
-          darkMode ? 'text-amber-500/30' : 'text-amber-700/30'
-        }`}>
-          Juz {pageData.verses[0]?.juz_number}
+      {/* Corner ornaments */}
+      {['top-[8px] left-[8px]', 'top-[8px] right-[8px]', 'bottom-[8px] left-[8px]', 'bottom-[8px] right-[8px]'].map((pos, i) => (
+        <div key={i} className={`absolute ${pos} w-8 h-8 pointer-events-none`}>
+          <div className={`absolute inset-0 ${
+            darkMode ? 'bg-amber-500/10' : 'bg-amber-600/10'
+          }`} style={{
+            clipPath: i < 2 
+              ? (i === 0 ? 'polygon(0 0, 100% 0, 0 100%)' : 'polygon(0 0, 100% 0, 100% 100%)')
+              : (i === 2 ? 'polygon(0 0, 0 100%, 100% 100%)' : 'polygon(100% 0, 0 100%, 100% 100%)')
+          }} />
+        </div>
+      ))}
+
+      {/* ══════════════════════════════════════════════════════════════════════════════
+          PAGE HEADER — Juz, Hizb, and Page number like authentic Mushaf
+         ══════════════════════════════════════════════════════════════════════════════ */}
+      <div className={`relative mx-[20px] mt-[20px] flex items-center justify-between px-4 py-2 border-b-2 ${
+        darkMode ? 'border-amber-600/20' : 'border-amber-600/15'
+      }`}>
+        {/* Left: Surah name */}
+        <span className={`text-xs tracking-wider font-semibold ${
+          darkMode ? 'text-amber-500/60' : 'text-amber-700/70'
+        }`} style={{ fontFamily: "'Scheherazade New', serif" }}>
+          {verseGroups[0]?.chapter?.name_arabic || ''}
         </span>
-        <span className={`text-[10px] tracking-[0.2em] ${
-          darkMode ? 'text-amber-500/30' : 'text-amber-700/30'
+
+        {/* Center: Juz/Hizb */}
+        <div className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-4 text-[10px] tracking-[0.2em] uppercase ${
+          darkMode ? 'text-amber-500/40' : 'text-amber-700/50'
+        }`}>
+          <span>Juz {pageData.verses[0]?.juz_number}</span>
+          <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-amber-500/30' : 'bg-amber-600/30'}`} />
+          <span>Hizb {Math.ceil((pageData.verses[0]?.hizb_number || 1) / 2)}</span>
+        </div>
+
+        {/* Right: Page number */}
+        <span className={`text-sm font-bold ${
+          darkMode ? 'text-amber-500/50' : 'text-amber-700/60'
         }`}>
           {page}
         </span>
-        <span className={`text-[10px] tracking-[0.2em] uppercase ${
-          darkMode ? 'text-amber-500/30' : 'text-amber-700/30'
-        }`}>
-          Hizb {Math.ceil((pageData.verses[0]?.hizb_number || 1) / 2)}
-        </span>
       </div>
 
-      {/* Main content area */}
-      <div className={`px-5 sm:px-8 ${compact ? 'py-5' : 'py-6 sm:py-10'}`}>
+      {/* ══════════════════════════════════════════════════════════════════════════════
+          MAIN CONTENT — The actual Quranic text
+         ══════════════════════════════════════════════════════════════════════════════ */}
+      <div className={`mx-[20px] mb-[20px] px-4 sm:px-6 ${compact ? 'py-4' : 'py-6 sm:py-8'}`}>
         {verseGroups.map((group, gi) => (
           <div key={`${group.chapterId}-${gi}`}>
-            {/* Surah Header — shown when first ayah of surah appears on this page */}
+            {/* ═══════════════════════════════════════════════════════════════════════
+                SURAH HEADER BANNER — Decorative header like real Quran
+               ═══════════════════════════════════════════════════════════════════════ */}
             {group.verses[0]?.verse_number === 1 && group.chapter && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-6 sm:mb-8"
               >
-                {/* Decorative surah banner */}
-                <div className={`relative rounded-2xl overflow-hidden mx-auto max-w-md ${
-                  darkMode ? 'bg-amber-500/[0.04]' : 'bg-amber-50'
-                }`}>
-                  {/* Corner ornaments */}
-                  <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-amber-500/30 rounded-tl-2xl" />
-                  <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-amber-500/30 rounded-tr-2xl" />
-                  <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-amber-500/30 rounded-bl-2xl" />
-                  <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-amber-500/30 rounded-br-2xl" />
+                {/* Ornate Surah Banner */}
+                <div className={`relative mx-auto max-w-sm overflow-hidden ${
+                  darkMode ? 'bg-emerald-900/40' : 'bg-emerald-800/80'
+                }`} style={{
+                  borderRadius: '30px / 50%',
+                  boxShadow: darkMode 
+                    ? '0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)'
+                    : '0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)'
+                }}>
+                  {/* Inner glow effect */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+                  
+                  {/* Side ornaments */}
+                  <div className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6">
+                    <div className={`w-full h-full border-2 rounded-full ${darkMode ? 'border-amber-400/30' : 'border-amber-300/50'}`} />
+                    <div className={`absolute inset-1 border rounded-full ${darkMode ? 'border-amber-400/20' : 'border-amber-300/30'}`} />
+                  </div>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6">
+                    <div className={`w-full h-full border-2 rounded-full ${darkMode ? 'border-amber-400/30' : 'border-amber-300/50'}`} />
+                    <div className={`absolute inset-1 border rounded-full ${darkMode ? 'border-amber-400/20' : 'border-amber-300/30'}`} />
+                  </div>
 
-                  <div className="px-6 py-4 text-center">
-                    {/* Arabic name */}
-                    <div className={`text-2xl sm:text-3xl font-bold mb-1 ${
-                      darkMode ? 'text-amber-400' : 'text-amber-700'
-                    }`} style={{ fontFamily: "'Scheherazade New', 'Amiri', serif" }}>
+                  <div className="px-10 py-3 text-center">
+                    {/* Arabic Surah name */}
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-0.5"
+                      style={{ fontFamily: "'Scheherazade New', 'Amiri', serif", textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
                       سُورَةُ {group.chapter.name_arabic}
                     </div>
-                    {/* Transliteration & details */}
-                    <div className={`text-[10px] tracking-[0.15em] uppercase ${
-                      darkMode ? 'text-amber-400/40' : 'text-amber-600/50'
-                    }`}>
-                      {group.chapter.name_simple} &middot; {group.chapter.verses_count} Ayat &middot; {group.chapter.revelation_place}
+                    {/* Info line */}
+                    <div className="text-[9px] tracking-[0.15em] uppercase text-white/60">
+                      {group.chapter.verses_count} Ayat &middot; {group.chapter.revelation_place === 'makkah' ? 'Makkiyyah' : 'Madaniyyah'}
                     </div>
                   </div>
                 </div>
 
                 {/* Bismillah */}
                 {group.chapter.bismillah_pre && (
-                  <div className="text-center mt-4 sm:mt-6">
+                  <div className="text-center mt-5">
                     <span className={`text-xl sm:text-2xl ${
-                      darkMode ? 'text-amber-400/50' : 'text-amber-600/70'
+                      darkMode ? 'text-amber-400/70' : 'text-amber-800/80'
                     }`} style={{ fontFamily: "'Scheherazade New', 'Amiri', serif" }}>
                       بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
                     </span>
@@ -225,11 +277,16 @@ export function QuranPage({
               </motion.div>
             )}
 
-            {/* Ayah text — flowing like a real Mushaf */}
+            {/* ═══════════════════════════════════════════════════════════════════════
+                AYAH TEXT — Flowing Arabic text like authentic Mushaf
+               ═══════════════════════════════════════════════════════════════════════ */}
             <div
-              className={`text-right ${compact ? 'leading-[2.8rem]' : 'leading-[3.2rem] sm:leading-[3.8rem]'} ${gi > 0 ? 'mt-2' : ''}`}
+              className={`text-right text-justify ${compact ? 'leading-[2.6rem]' : 'leading-[3rem] sm:leading-[3.5rem]'} ${gi > 0 ? 'mt-3' : ''}`}
               dir="rtl"
-              style={{ fontFamily: "'Scheherazade New', 'Amiri', 'Traditional Arabic', serif" }}
+              style={{ 
+                fontFamily: "'Scheherazade New', 'Amiri', 'Traditional Arabic', serif",
+                textAlignLast: 'center'
+              }}
             >
               {group.verses.map((verse) => {
                 const key = `${verse.chapter_id}:${verse.verse_number}`;
@@ -240,50 +297,50 @@ export function QuranPage({
                 return (
                   <span
                     key={verse.verse_key}
-                    className={`inline relative transition-all duration-200 rounded-md px-0.5 ${
+                    className={`inline relative transition-all duration-200 rounded px-0.5 ${
                       onAyahClick ? 'cursor-pointer' : ''
                     } ${
                       hasMistakes
                         ? darkMode
-                          ? 'bg-red-500/15 hover:bg-red-500/25 decoration-red-500/40'
-                          : 'bg-red-100/80 hover:bg-red-200 decoration-red-400'
+                          ? 'bg-red-500/20 hover:bg-red-500/30'
+                          : 'bg-red-100 hover:bg-red-200'
                         : isSelected
                           ? darkMode
-                            ? 'bg-purple-500/15 hover:bg-purple-500/25'
+                            ? 'bg-purple-500/20 hover:bg-purple-500/30'
                             : 'bg-purple-100 hover:bg-purple-200'
                           : sessionActive
                             ? darkMode
-                              ? 'hover:bg-emerald-500/10'
+                              ? 'hover:bg-emerald-500/15'
                               : 'hover:bg-emerald-50'
                             : darkMode
-                              ? 'hover:bg-white/[0.03]'
-                              : 'hover:bg-amber-50'
+                              ? 'hover:bg-white/[0.05]'
+                              : 'hover:bg-amber-100/50'
                     }`}
                     onClick={() => onAyahClick?.(verse)}
                   >
                     {/* Ayah text */}
                     <span className={`${compact ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'} ${
-                      darkMode ? 'text-amber-100/90' : 'text-[#1a0a00]'
+                      darkMode ? 'text-amber-100/95' : 'text-[#1f0f05]'
                     }`}>
                       {verse.text_uthmani}
                     </span>
 
-                    {/* Decorative Ayah number circle */}
-                    <span className={`inline-flex items-center justify-center ${
-                      compact ? 'w-6 h-6 text-[9px]' : 'w-7 h-7 sm:w-8 sm:h-8 text-[10px] sm:text-xs'
-                    } rounded-full mx-0.5 align-middle font-medium ${
+                    {/* Decorative Ayah end marker — styled like real Quran */}
+                    <span className={`inline-flex items-center justify-center mx-1 align-middle ${
+                      compact ? 'w-5 h-5 text-[8px]' : 'w-6 h-6 sm:w-7 sm:h-7 text-[9px] sm:text-[10px]'
+                    } rounded-full font-bold ${
                       hasMistakes
-                        ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                        ? 'bg-red-500/30 text-red-300 border-2 border-red-400/50'
                         : darkMode
-                          ? 'bg-amber-500/10 text-amber-400/70 border border-amber-500/20'
-                          : 'bg-amber-100 text-amber-700 border border-amber-300/60'
-                    }`}>
+                          ? 'bg-amber-500/20 text-amber-300 border-2 border-amber-500/40'
+                          : 'bg-amber-600/15 text-amber-800 border-2 border-amber-600/40'
+                    }`} style={{ fontFamily: 'system-ui, sans-serif' }}>
                       {verse.verse_number}
                     </span>
 
                     {/* Mistake badge */}
                     {hasMistakes && (
-                      <span className="absolute -top-2 -left-0.5 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center shadow-lg shadow-red-500/30 z-10">
+                      <span className="absolute -top-2 -left-1 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center shadow-lg shadow-red-500/40 z-10">
                         {mistakeCount}
                       </span>
                     )}
@@ -295,11 +352,12 @@ export function QuranPage({
         ))}
       </div>
 
-      {/* Bottom ornament */}
-      <div className="relative h-3">
-        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
-      </div>
+      {/* ══════════════════════════════════════════════════════════════════════════════
+          BOTTOM BORDER DECORATION
+         ══════════════════════════════════════════════════════════════════════════════ */}
+      <div className={`absolute bottom-[20px] left-[20px] right-[20px] h-[2px] ${
+        darkMode ? 'bg-amber-600/20' : 'bg-amber-600/15'
+      }`} />
     </div>
   );
 }
